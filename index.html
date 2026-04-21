@@ -19,31 +19,58 @@
             --gold: #ffd700;
         }
 
+        /* Grass Background + Blur Integration */
         body {
             margin: 0;
             padding: 20px 10px;
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #ff4d8d, #d500f9, #2979ff);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
             color: #fff;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
             overflow-x: hidden;
             max-width: 100%;
+            position: relative;
+            /* HD Grass Image Background */
+            background: url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6') no-repeat center center/cover;
+            background-attachment: fixed;
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        /* Strong Blur Overlay - gives the frosted glass effect */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            backdrop-filter: blur(25px);
+            background: rgba(0, 50, 0, 0.3);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        /* Extra Glow Effect - soft green glow */
+        body::after {
+            content: "";
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: rgba(0, 255, 100, 0.3);
+            filter: blur(120px);
+            border-radius: 50%;
+            top: 30%;
+            left: 30%;
+            z-index: -1;
+            pointer-events: none;
         }
 
         .title-container {
             text-align: center;
             margin-bottom: 25px;
             perspective: 1000px;
+            position: relative;
+            z-index: 2;
         }
 
         .sonam-barbie-title {
@@ -128,6 +155,8 @@
             border: 1px solid rgba(255, 255, 255, 0.3);
             width: 100%;
             box-sizing: border-box;
+            position: relative;
+            z-index: 2;
         }
 
         label {
@@ -208,6 +237,8 @@
             max-width: 900px;
             margin: 0 auto;
             flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
         }
 
         .box {
@@ -343,9 +374,10 @@
             color: rgba(255, 255, 255, 0.8);
             user-select: none;
             text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+            position: relative;
+            z-index: 2;
         }
 
-        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -358,23 +390,18 @@
             border-radius: 10px;
         }
 
-        /* Decorative elements */
-        .decoration {
-            position: absolute;
-            z-index: -1;
-            opacity: 0.7;
-        }
-
         .star {
-            position: absolute;
+            position: fixed;
             background: white;
             border-radius: 50%;
             animation: twinkle 3s infinite;
+            z-index: 1;
+            pointer-events: none;
         }
 
         @keyframes twinkle {
-            0%, 100% { opacity: 0.2; }
-            50% { opacity: 1; }
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
         }
 
         .barbie-icon {
@@ -391,7 +418,6 @@
     </style>
 </head>
 <body>
-    <!-- Decorative stars -->
     <div id="starsContainer"></div>
 
     <div class="title-container">
@@ -438,11 +464,11 @@
   /help ➡️ Show all available commands.
 
 🔐 **GROUP SECURITY**:
-  /group on <name> ➡️ Lock group name.
-  /nickname on <name> ➡️ Lock all nicknames.
+  /group on &lt;name&gt; ➡️ Lock group name.
+  /nickname on &lt;name&gt; ➡️ Lock all nicknames.
   
 💥 **TARGET SYSTEM (ADMIN ONLY)**:
-  /target on <mention> ➡️ Start auto-attack on someone.
+  /target on &lt;mention&gt; ➡️ Start auto-attack on someone.
   /target off ➡️ Stop attack.
 
 ⚔️ **FIGHT MODE (ADMIN ONLY)**:
@@ -451,7 +477,7 @@
 
 🆔 **ID DETAILS**:
   /tid ➡️ Get group ID.
-  /uid <mention> ➡️ Get user ID.
+  /uid &lt;mention&gt; ➡️ Get user ID.
 </pre>
             </div>
             <div class="contact-info">
@@ -474,10 +500,9 @@
         const groupsEl = document.getElementById('groupsList');
         const clearLogsBtn = document.getElementById('clearLogs');
 
-        // Create decorative stars
         function createStars() {
             const starsContainer = document.getElementById('starsContainer');
-            for (let i = 0; i < 50; i++) {
+            for (let i = 0; i < 60; i++) {
                 const star = document.createElement('div');
                 star.classList.add('star');
                 star.style.width = Math.random() * 4 + 2 + 'px';
@@ -485,6 +510,7 @@
                 star.style.left = Math.random() * 100 + 'vw';
                 star.style.top = Math.random() * 100 + 'vh';
                 star.style.animationDelay = Math.random() * 5 + 's';
+                star.style.animationDuration = Math.random() * 3 + 2 + 's';
                 starsContainer.appendChild(star);
             }
         }
@@ -498,7 +524,13 @@
 
         clearLogsBtn.onclick = () => {
             logsEl.textContent = '';
+            addLog('[🔄] Logs cleared successfully');
         };
+
+        socket.on('connect', () => {
+            addLog('[✅] Connected to bot server');
+            addLog('[💖] Welcome to MR PRINCE Bot Panel');
+        });
 
         socket.on('botlog', message => {
             addLog('[BOT] ' + message);
@@ -506,29 +538,47 @@
 
         socket.on('groupsUpdate', groups => {
             groupsEl.innerHTML = '';
-            groups.forEach(gid => {
+            if (groups.length === 0) {
                 const li = document.createElement('li');
-                li.textContent = gid;
+                li.textContent = 'No groups joined yet. Start bot to see groups.';
                 groupsEl.appendChild(li);
-            });
+            } else {
+                groups.forEach(gid => {
+                    const li = document.createElement('li');
+                    li.textContent = gid;
+                    groupsEl.appendChild(li);
+                });
+            }
         });
 
         document.getElementById('configForm').addEventListener('submit', e => {
             e.preventDefault();
             const formData = new FormData(e.target);
+            addLog('[⚙️] Sending configuration to server...');
             fetch('/configure', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                 body: new URLSearchParams(formData)
             })
-            .then(res => res.text())
-            .then(msg => alert(msg))
-            .catch(err => alert('Error: ' + err.message));
+            .then(res => {
+                if (!res.ok) throw new Error('Server error: ' + res.status);
+                return res.text();
+            })
+            .then(msg => {
+                addLog('[✅] ' + msg);
+                alert(msg);
+            })
+            .catch(err => {
+                addLog('[❌] Error: ' + err.message);
+                alert('Error: ' + err.message);
+            });
         });
 
-        // Initialize stars when page loads
-        window.addEventListener('load', createStars);
+        window.addEventListener('load', () => {
+            createStars();
+            addLog('[🌟] MR PRINCE Bot Panel Ready');
+            addLog('[💬] Fill the form and click "Start Bot" to begin');
+        });
     </script>
 </body>
 </html>
-"""
