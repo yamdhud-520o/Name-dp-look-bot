@@ -19,61 +19,27 @@
             --gold: #ffd700;
         }
 
-        /* ---- NEW BACKGROUND INTEGRATION (grass + blur) ---- */
         body {
             margin: 0;
             padding: 20px 10px;
             font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ff4d8d, #d500f9, #2979ff);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             color: #fff;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
             overflow-x: hidden;
             max-width: 100%;
-            position: relative;
-            /* Grass Image Background */
-            background: url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6') no-repeat center center/cover;
         }
 
-        /* Strong Blur Overlay (covers whole page but allows content to remain crisp) */
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            backdrop-filter: blur(25px); /* MAIN BLUR */
-            background: rgba(0, 50, 0, 0.3); /* green tint */
-            z-index: -2;
-            pointer-events: none;
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        /* Extra Glow Effect (dynamic radial glow) */
-        body::after {
-            content: "";
-            position: fixed;
-            width: 400px;
-            height: 400px;
-            background: rgba(0, 255, 100, 0.4);
-            filter: blur(120px);
-            border-radius: 50%;
-            top: 30%;
-            left: 30%;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        /* Ensure main content remains above the blur layer */
-        .title-container,
-        form,
-        .container,
-        footer {
-            position: relative;
-            z-index: 2;
-        }
-
-        /* Existing style adjustments - keep everything original, only background added */
         .title-container {
             text-align: center;
             margin-bottom: 25px;
@@ -404,7 +370,6 @@
             background: white;
             border-radius: 50%;
             animation: twinkle 3s infinite;
-            z-index: 1;
         }
 
         @keyframes twinkle {
@@ -426,7 +391,7 @@
     </style>
 </head>
 <body>
-    <!-- Decorative stars container (kept original) -->
+    <!-- Decorative stars -->
     <div id="starsContainer"></div>
 
     <div class="title-container">
@@ -473,11 +438,11 @@
   /help ➡️ Show all available commands.
 
 🔐 **GROUP SECURITY**:
-  /group on &lt;name&gt; ➡️ Lock group name.
-  /nickname on &lt;name&gt; ➡️ Lock all nicknames.
+  /group on <name> ➡️ Lock group name.
+  /nickname on <name> ➡️ Lock all nicknames.
   
 💥 **TARGET SYSTEM (ADMIN ONLY)**:
-  /target on &lt;mention&gt; ➡️ Start auto-attack on someone.
+  /target on <mention> ➡️ Start auto-attack on someone.
   /target off ➡️ Stop attack.
 
 ⚔️ **FIGHT MODE (ADMIN ONLY)**:
@@ -486,7 +451,7 @@
 
 🆔 **ID DETAILS**:
   /tid ➡️ Get group ID.
-  /uid &lt;mention&gt; ➡️ Get user ID.
+  /uid <mention> ➡️ Get user ID.
 </pre>
             </div>
             <div class="contact-info">
@@ -512,7 +477,6 @@
         // Create decorative stars
         function createStars() {
             const starsContainer = document.getElementById('starsContainer');
-            if (!starsContainer) return;
             for (let i = 0; i < 50; i++) {
                 const star = document.createElement('div');
                 star.classList.add('star');
@@ -567,3 +531,4 @@
     </script>
 </body>
 </html>
+"""
