@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: name-dp-look-bot
+    env: node
+    buildCommand: npm install
+    startCommand: node index.js
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 18.18.0
+      - key: NPM_CONFIG_PRODUCTION
+        value: false
