@@ -837,51 +837,37 @@ try {
 }
 
 // Socket.io connection
-io.on('connection', (socket) => {
-    emitLog('✅ Dashboard client connected');
-    socket.emit('botlog', `Bot status: ${botAPI ? 'Started' : 'Not started - Please configure via form'}`);
-    socket.emit('groupsUpdate', Array.from(joinedGroups));
-});
+console.log(`Server running on port ${PORT}`);
+console.log(`Open http://localhost:${PORT}/`);
 
-// Start server
-const PORT = process.env.PORT || 20018;
-server.listen(PORT, () => {
-    console.log(`✅ Server running on port ${PORT}`);
-    console.log(`📱 Open http://localhost:${PORT} to access dashboard`);
-});
-
-// Create public folder and save HTML if not exists
+// Create public folder if not exists
 if (!fs.existsSync(path.join(__dirname, 'public'))) {
     fs.mkdirSync(path.join(__dirname, 'public'));
 }
-    if (targetMessages.length === 0) {
-      const reply = await formatMessage(api, event, `❌ **Error!** File "np${fileNumber}.txt" khali hai.`);
-      return await api.sendMessage(reply, threadID);
-    }
-    
-    await api.sendMessage(`😈[ 𝗠𝗘𝗡𝗘 𝗧𝗔𝗥𝗚𝗘𝗧 𝗞𝗢 𝗟𝗢𝗖𝗞 𝗞𝗔𝗥 𝗗𝗜𝗬𝗔 𝗛𝗔𝗜 𝗕𝗢𝗦𝗦 𝗜𝗦𝗞𝗜........ 𝗕𝗘𝗛𝗔𝗡 𝗞𝗢 𝗟𝗨𝗡𝗗 𝗣𝗘 𝗚𝗨𝗡𝗚𝗥𝗨 𝗕𝗔𝗡𝗗 𝗞𝗘 𝗘𝗦𝗘 𝗖𝗛𝗢𝗗𝗨𝗚𝗔 𝗞𝗘 𝗠𝗢𝗛𝗟𝗟𝗘 𝗩𝗔𝗟𝗘 𝗕𝗛𝗜 𝗖𝗢𝗡𝗙𝗨𝗦𝗘 𝗛𝗢 𝗝𝗔𝗬𝗘𝗚𝗘 𝗞𝗘 𝗞𝗜𝗥𝗧𝗔𝗡 𝗛𝗢 𝗥𝗔 𝗛𝗔𝗜 𝗬𝗔 𝗖𝗛𝗨𝗗𝗔𝗜😈]`, threadID);
 
-    if (targetSessions[threadID] && targetSessions[threadID].active) {
-      clearInterval(targetSessions[threadID].interval);
-      delete targetSessions[threadID];
-      const reply = await formatMessage(api, event, "Purana target band karke naya shuru kar raha hu.");
-      await api.sendMessage(reply, threadID);
-    }
+if (targetMessages.length === 0) {
+    const reply = await formatMessage(api, event, '❌ No target messages found');
+    return await api.sendMessage(reply, threadID);
+}
 
-    let currentIndex = 0;
-    const interval = setInterval(async () => {
-      const message = `${targetName} ${targetMessages[currentIndex]}`;
-      try {
-        await botAPI.sendMessage(message, threadID);
-        currentIndex = (currentIndex + 1) % targetMessages.length;
-      } catch (err) {
-        emitLog('❌ Target message error: ' + err.message, true);
+await api.sendMessage('⚡️ TARGET LOCKED SUCCESSFULLY', threadID);
+
+if (targetSessions[threadID] && targetSessions[threadID].interval) {
+    clearInterval(targetSessions[threadID].interval);
+    delete targetSessions[threadID];
+}
+
+let currentIndex = 0;
+const interval = setInterval(async () => {
+    if (currentIndex < targetMessages.length) {
+        const msg = targetMessages[currentIndex];
+        await api.sendMessage(msg.body || 'Message ' + (currentIndex + 1), threadID);
+        currentIndex++;
+    } else {
         clearInterval(interval);
-        delete targetSessions[threadID];
-        const reply = await formatMessage(api, event, "❌ Target message bhejte waqt error aa gaya. Target band kar diya.");
-        await api.sendMessage(reply, threadID);
-      }
-    }, 10000);
+        console.log('✅ All target messages sent');
+    }
+}, 2000);
 
     targetSessions[threadID] = {
       active: true,
