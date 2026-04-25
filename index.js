@@ -279,7 +279,7 @@ async function formatMessage(api, event, mainMessage) {
       emitLog('❌ Error fetching user info: ' + e.message, true);
     }
     
-    const styledMentionBody = `             [🦋°🫧•𖨆٭ ${senderName}꙳○𖨆°🦋]`;
+    const styledMentionBody = `             [⚜️3> ${senderName}<3⚜️]`;
     const fromIndex = styledMentionBody.indexOf(senderName);
     
     const mentionObject = {
@@ -307,9 +307,9 @@ async function handleMessage(api, event) {
     if (Object.keys(mentions || {}).includes(adminID)) {
       const abuses = [
         "Oye mere boss ko gali dega to teri bah.. chod dunga!",
-        "Mai tere baap ko chod du ga bsdike!",
-        "Ran..ke mdrxhod teri ma ka b..da!",
-        "Teri ma ki ch..tere baap ka nokar nahi hu randi ke!"
+        "𝘛𝘈𝘙𝘐 𝘓𝘈𝘋𝘒𝘐𝘐𝘐 𝘒𝘐 𝘒𝘈𝘓𝘐 𝘊𝘏𝘜𝘛 𝘔𝘈𝘙 𝘒𝘌 𝘉𝘏𝘎𝘎 𝘒𝘈𝘜𝘎𝘈",
+        "ᴛᴀʀɪ ᴍᴀᴀ ᴋᴏ ᴄʜᴏᴅᴜ ʙᴀᴛᴀ ᴛᴀʀᴇ ꜱᴀᴍɴᴇ",
+        "𝚃𝙰𝚁𝙴 𝙳𝙰𝙳𝙰 𝙺𝙸 𝙳𝙷𝙴𝙴 𝙺𝙸 𝙲𝙷𝚄𝚃 𝚃𝙰𝚁𝙴 𝙱𝙰𝙰𝙿 𝙺𝙰 𝙽𝙾𝙺𝙰𝚁 𝚃𝙷𝙾𝚁𝙸 𝙷𝚄"
       ];
       const randomAbuse = abuses[Math.floor(Math.random() * abuses.length)];
       
@@ -475,7 +475,7 @@ async function handleMessage(api, event) {
         if (!isAdmin) {
           commandReply = `Teri ma ki ch.. tere baap ka nokar nahi hu randi ke!`;
         } else {
-          commandReply = `Ye h mera prefix ${prefix} ko prefix ho use lgake bole ye h mera prefix or devil mera boss h ab bol mdrxhod kya kam h tujhe mujhse bsdike`;
+          commandReply = `Ye h mera prefix ${prefix} ko prefix ho use lgake bole ye h mera prefix or YAMDHUD MARE PAPA HAI BATA AB TARI MAA KO CHODU KYA KAAM H THUJHA`;
         }
     }
     
@@ -539,7 +539,7 @@ async function handleNicknameCommand(api, event, args, isAdmin) {
           await api.changeNickname(nickname, threadID, pid);
         }
       }
-      const reply = await formatMessage(api, event, `😈𝐆𝐑𝐎𝐔𝐏 𝐊𝐀 𝐍𝐈𝐂𝐊 𝐍𝐀𝐌𝐄 𝐋𝐎𝐂𝐊 𝐇𝐎 𝐆𝐀𝐘𝐀 𝐇𝐀𝐈 𝐀𝐁 𝐂𝐇𝐀𝐍𝐆𝐄 𝐊𝐀𝐑 𝐊𝐄 𝐃𝐈𝐊𝐇𝐀 𝐓𝐄𝐑𝐈 𝐆𝐀𝐀𝐍𝐃 𝐌𝐀𝐀𝐑 𝐋𝐔𝐆𝐀😈`);
+      const reply = await formatMessage(api, event, `😈𝐆𝐑𝐎𝐔𝐏 𝐊𝐀 𝐍𝐈𝐂𝐊 𝐍𝐀𝐌𝐄 𝐋𝐎𝐂𝐊 𝐇𝐎 𝐆𝐀𝐘𝐀 𝐇𝐀𝐈 𝐀𝐁 𝐀𝐁 𝐓𝐀𝐑𝐈 𝐌𝐀𝐀 𝐂𝐇𝐔𝐃𝐍𝐈 𝐏𝐀𝐊𝐈 𝐇𝐀𝐈 𝐌𝐀𝐃𝐀𝐑𝐉𝐀𝐀𝐓`);
       await api.sendMessage(reply, threadID);
     } else if (subCommand === 'off') {
         delete lockedNicknames[threadID];
@@ -724,7 +724,7 @@ async function handleThreadNameChange(api, event) {
         const authorName = userInfo[authorID]?.name || "User";
         
         await api.sendMessage({
-          body: `🤣𝗚𝗥𝗢𝗨𝗣 𝗞𝗔 𝗡𝗔𝗠𝗘 𝗖𝗛𝗔𝗡𝗚𝗘 𝗞𝗔𝗥𝗘𝗚𝗔 𝗗𝗨𝗕𝗔𝗥𝗔 𝗧𝗢 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗜 𝗖𝗛𝗨𝗧𝗧 𝗠𝗔𝗜 𝗣𝗜𝗭𝗔 𝗟𝗔𝗚𝗔 𝗞𝗘 𝗞𝗛𝗔 𝗝𝗔𝗨𝗚𝗔 𝗟𝗔𝗚𝗔 𝗝𝗢𝗥🤣`,
+          body: `😂𝐆𝐎𝐑𝐔𝐏 𝐊𝐀 𝐍𝐀𝐌𝐄 𝐂𝐇𝐀𝐍𝐆𝐄 𝐊𝐀𝐑𝐄𝐆𝐀 𝐓𝐌𝐊𝐂 𝐃𝐎𝐒𝐓 𝐀𝐁 𝐀𝐏𝐊𝐈 𝐁𝐇𝐄𝐀𝐍 𝐂𝐇𝐔𝐃 𝐆𝐀𝐈 😂😂`,
           mentions: [{ tag: authorName, id: authorID, fromIndex: 0 }]
         }, threadID);
       }
@@ -807,12 +807,12 @@ async function handlePhotoLockCommand(api, event, args, isAdmin) {
 async function handleHelpCommand(api, event) {
   const { threadID, senderID } = event;
   const helpMessage = `
-😈 𝐁𝐎𝐓 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 (PRINCE 𝐌𝐎𝐃𝐄) 😈
+⚜️ 𝐁𝐎𝐓 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 (𝟗𝐌𝐀𝐍-𝐗-𝐘𝐀𝐌𝐃𝐇𝐔𝐃) ⚜️
 ---
 📚 **𝐌𝐀𝐃𝐀𝐃**:
   ${prefix}help ➡️ 𝐒𝐀𝐀𝐑𝐄 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 𝐊𝐈 𝐋𝐈𝐒𝐓 𝐃𝐄𝐊𝐇𝐄𝐈𝐍.
 
-🔐 **𝐆𝐑𝐎𝐔𝐏 𝐒𝐄𝐂𝐔𝐑𝐈𝐓𝐘**:
+🔐 𝐆𝐑𝐎𝐔𝐏 𝐒𝐄𝐂𝐔𝐑𝐈𝐓𝐘:
   ${prefix}group on <name> ➡️ 𝐆𝐑𝐎𝐔𝐏 𝐊𝐀 𝐍𝐀𝐀𝐌 𝐋𝐎𝐂𝐊 𝐊𝐀𝐑𝐄𝐈𝐍.
   ${prefix}group off ➡️ 𝐒𝐓𝐎𝐏 𝐊𝐀𝐑𝐍𝐄 𝐊𝐄 𝐋𝐈𝐘𝐄 /stop 𝐔𝐒𝐄 𝐊𝐀𝐑𝐄𝐈𝐍.
   ${prefix}nickname on <name> ➡️ 𝐒𝐀𝐁𝐇𝐈 𝐍𝐈𝐂𝐊𝐍𝐀𝐌𝐄𝐒 𝐋𝐎𝐂𝐊 𝐊𝐀𝐑𝐄𝐈𝐍.
@@ -821,7 +821,7 @@ async function handleHelpCommand(api, event) {
   ${prefix}photolock off ➡️ 𝐆𝐑𝐎𝐔𝐏 𝐏𝐇𝐎𝐓𝐎 𝐔𝐍𝐋𝐎𝐊 𝐊𝐀𝐑𝐄𝐈𝐍.
   ${prefix}botnick <name> ➡️ 𝐁𝐎𝐓 𝐊𝐀 𝐊𝐇𝐔𝐃 𝐊𝐀 𝐍𝐈𝐂𝐊𝐍𝐀𝐌𝐄 𝐒𝐄𝐓 𝐊𝐀𝐑𝐄𝐈𝐍.
 
-💥 **𝐓𝐀𝐑𝐆𝐄𝐓 𝐒𝐘𝐒𝐓𝐄𝐌 (𝐀𝐃𝐌𝐈𝐍 𝐎𝐍𝐋𝐘)**:
+💥 𝐓𝐀𝐑𝐆𝐄𝐓 𝐒𝐘𝐒𝐓𝐄𝐌 (𝐀𝐃𝐌𝐈𝐍 𝐎𝐍𝐋𝐘):
   ${prefix}target on <file_number> <name> ➡️ 𝐊𝐈𝐒𝐈 𝐏𝐀𝐑 𝐁𝐇𝐈 𝐀𝐔𝐓𝐎-𝐀𝐓𝐓𝐀𝐂𝐊 𝐒𝐇𝐔𝐑𝐔 𝐊𝐀𝐑𝐄𝐈𝐍.
   ${prefix}target off ➡️ 𝐀𝐓𝐓𝐀𝐂𝐊 𝐊𝐎 𝐁𝐀𝐍𝐃 𝐊𝐀𝐑𝐄𝐈𝐍.
 
