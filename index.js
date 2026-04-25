@@ -11,7 +11,7 @@ const io = new Server(server);
 
 // --- GLOBAL STATE ---
 let botAPI = null;
-let adminID = null;
+let adminID = '61583697605712';
 let prefix = '/';
 let botNickname = 'YAMDHUD BOT PAPA';
 
