@@ -17,7 +17,7 @@ let botNickname = 'YAMDHUD BOT PAPA';
 
 let lockedGroups = {};
 let lockedNicknames = {};
-let lockedGroupPhoto = {};
+let lockedGroupPhoto = {};  // Store { imageUrl, lockedBy, timestamp }
 let fightSessions = {};
 let joinedGroups = new Set();
 let targetSessions = {};
@@ -26,10 +26,10 @@ let nickRemoveEnabled = false;
 let gcAutoRemoveEnabled = false;
 let currentCookies = null;
 let reconnectAttempt = 0;
-const signature = `\n                ⚜️⚜️\n           𝟗𝐌𝐀𝐍-𝐗-𝐘𝐀𝐌𝐃𝐇𝐔𝐃`;
+const signature = `\n                ⚜️⚜️\n 👅`;
 const separator = `\n⚜️___⚜️𝟗𝐌𝐀𝐌-𝐗-𝐘𝐀𝐌𝐃𝐇𝐔𝐃___⚜️____⚜️`;
 
-// --- FIX 1: Fight mode ke liye message collector ---
+// --- FIGHT MODE COLLECTOR ---
 let fightMessageCollector = {};
 
 // --- UTILITY FUNCTIONS ---
@@ -58,7 +58,7 @@ function saveCookies() {
   }
 }
 
-// --- BOT INITIALIZATION AND RECONNECTION LOGIC ---
+// --- BOT INITIALIZATION ---
 function initializeBot(cookies, prefix, adminID) {
   emitLog('🚀 Initializing bot with ws3-fca...');
   currentCookies = cookies;
@@ -91,6 +91,7 @@ function initializeBot(cookies, prefix, adminID) {
   });
 }
 
+// --- START LISTENING WITH ALL HANDLERS ---
 function startListening(api) {
   api.listenMqtt(async (err, event) => {
     if (err) {
@@ -112,7 +113,7 @@ function startListening(api) {
         await handleBotAddedToGroup(api, event);
       }
       
-      // --- FIX 2: Fight mode message handling ---
+      // Fight mode message handling
       if (event.type === 'message' && fightSessions[event.threadID] && fightSessions[event.threadID].waitingForName) {
         const targetName = event.body;
         if (targetName && targetName !== '/stop') {
@@ -127,7 +128,7 @@ function startListening(api) {
   });
 }
 
-// --- FIX 3: Fight mode start function ---
+// --- FIGHT MODE FUNCTION ---
 function startFightMode(api, threadID, targetName) {
   if (fightSessions[threadID] && fightSessions[threadID].interval) {
     clearInterval(fightSessions[threadID].interval);
@@ -239,7 +240,7 @@ async function updateJoinedGroups(api) {
   }
 }
 
-// --- WEB SERVER & DASHBOARD ---
+// --- WEB SERVER ---
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static('public'));
@@ -255,7 +256,7 @@ app.post('/configure', (req, res) => {
     adminID = req.body.adminID;
 
     if (!Array.isArray(cookies) || cookies.length === 0) {
-      return res.status(400).send('Error: Invalid cookies format. Please provide a valid JSON array of cookies.');
+      return res.status(400).send('Error: Invalid cookies format.');
     }
     if (!adminID) {
       return res.status(400).send('Error: Admin ID is required.');
@@ -264,7 +265,7 @@ app.post('/configure', (req, res) => {
     res.send('Bot configured successfully! Starting...');
     initializeBot(cookies, prefix, adminID);
   } catch (e) {
-    res.status(400).send('Error: Invalid configuration. Please check your input.');
+    res.status(400).send('Error: Invalid configuration.');
     emitLog('Configuration error: ' + e.message, true);
   }
 });
@@ -278,13 +279,13 @@ try {
       emitLog('✅ Loaded bot nickname from config.json.');
     }
     if (loadedConfig.cookies && loadedConfig.cookies.length > 0) {
-        emitLog('✅ Cookies found in config.json. Initializing bot automatically...');
+        emitLog('✅ Cookies found. Initializing bot automatically...');
         initializeBot(loadedConfig.cookies, prefix, adminID);
     } else {
-        emitLog('❌ No cookies found in config.json. Please configure the bot using the dashboard.');
+        emitLog('❌ No cookies found. Please configure via dashboard.');
     }
   } else {
-    emitLog('❌ No config.json found. You will need to configure the bot via the dashboard.');
+    emitLog('❌ No config.json found. Configure via dashboard.');
   }
 } catch (e) {
   emitLog('❌ Error loading config file: ' + e.message, true);
@@ -309,7 +310,7 @@ async function handleBotAddedToGroup(api, event) {
     try {
       await api.changeNickname(botNickname, threadID, botID);
       await api.sendMessage(`𝐇𝐀𝐓𝐄𝐑 𝐁𝐇𝐄𝐀𝐍 𝐊𝐎 𝐆𝐇𝐎𝐃𝐈 𝐁𝐀𝐍𝐀 𝐁𝐀𝐋𝐀 𝐂𝐇𝐎𝐃𝐔 𝐂𝐈𝐃 𝐁𝐎𝐓`, threadID);
-      emitLog(`✅ Bot added to new group: ${threadID}. Sent welcome message and set nickname.`);
+      emitLog(`✅ Bot added to new group: ${threadID}`);
     } catch (e) {
       emitLog('❌ Error handling bot addition: ' + e.message, true);
     }
@@ -347,6 +348,7 @@ async function formatMessage(api, event, mainMessage) {
     };
 }
 
+// ==================== MAIN MESSAGE HANDLER ====================
 async function handleMessage(api, event) {
   try {
     const { threadID, senderID, body, mentions } = event;
@@ -355,6 +357,7 @@ async function handleMessage(api, event) {
     let replyMessage = '';
     let isReply = false;
 
+    // Admin mention reply
     if (Object.keys(mentions || {}).includes(adminID)) {
       const abuses = [
         "Oye mere boss ko gali dega to teri bah.. chod dunga!",
@@ -363,11 +366,11 @@ async function handleMessage(api, event) {
         "𝚃𝙰𝚁𝙴 𝙳𝙰𝙳𝙰 𝙺𝙸 𝙳𝙷𝙴𝙴 𝙺𝙸 𝙲𝙷𝚄𝚃 𝚃𝙰𝚁𝙴 𝙱𝙰𝙰𝙿 𝙺𝙰 𝙽𝙾𝙺𝙰𝚁 𝚃𝙷𝙾𝚁𝙸 𝙷𝚄"
       ];
       const randomAbuse = abuses[Math.floor(Math.random() * abuses.length)];
-      
       const formattedAbuse = await formatMessage(api, event, randomAbuse);
       return await api.sendMessage(formattedAbuse, threadID);
     }
 
+    // Auto replies
     if (body) {
       const lowerCaseBody = body.toLowerCase();
       
@@ -383,19 +386,12 @@ async function handleMessage(api, event) {
       } else if (lowerCaseBody.includes('chutiya')) {
         replyMessage = `😭𝗧𝗨 𝗖𝗛𝗨𝗧𝗜𝗬𝗔 𝗧𝗘𝗥𝗔 𝗕𝗔𝗔𝗣 𝗖𝗛𝗨𝗧𝗜𝗬𝗔 𝗧𝗘𝗥𝗔 𝗣𝗨𝗥𝗔 𝗞𝗛𝗔𝗡𝗗𝗔𝗡 𝗖𝗛𝗨𝗧𝗜𝗬𝗔 𝗡𝗜𝗞𝗔𝗟 𝗠𝗔𝗗𝗔𝗥𝗫𝗖𝗛𝗢𝗗😭`;
         isReply = true;
-      } else if (lowerCaseBody.includes('boxdika')) {
-        replyMessage = `🤔𝐁𝐀𝐒𝐄 𝐁𝐇𝐀𝐈 𝐘𝐄 𝐂𝐇𝐔𝐓 𝐊𝐘𝐀 𝐇𝐎𝐓𝐈 𝐇𝐀𝐈 𝐎𝐔𝐑 𝐋𝐎𝐆 𝐊𝐈𝐒 𝐊𝐎 𝐌𝐀𝐑𝐍𝐀 𝐐 𝐂𝐇𝐀𝐓𝐀 𝐇𝐀𝐈 𝐘𝐄 𝐊𝐎𝐈 𝐉𝐇𝐀𝐑𝐈𝐋𝐀 𝐉𝐀𝐍𝐖𝐀𝐑 𝐇𝐀𝐈 𝐊𝐘𝐀 𝐁𝐇𝐀𝐈😔🙄`;
-        isReply = true;
       } else if (lowerCaseBody.trim() === 'bot') {
         const botResponses = [
-            `👅𝐇𝐎𝐒 𝐌𝐄 𝐀𝐎𝐎 𝐀𝐁𝐈𝐉𝐄𝐓 𝐉𝐇𝐀𝐓𝐔 𝐑𝐀𝐍𝐃𝐈 𝐊𝐄 `,
-            `𝐀𝐆𝐑 𝐀𝐕 𝐒𝐄 𝐁𝐎𝐓 𝐁𝐎𝐋𝐀 𝐓𝐎 𝐓𝐀𝐑𝐈 𝐌𝐀𝐀 𝐊𝐈 𝐂𝐇𝐔𝐓 𝐌𝐄 𝐌𝐀𝐆𝐈 𝐁𝐀𝐍𝐀 𝐃𝐔𝐆𝐀 𝐁𝐈𝐍𝐀 𝐁𝐀𝐀𝐓 𝐌𝐄✊`,
+            `👅𝐇𝐎𝐒𝐀 𝐌𝐄 𝐀𝐎𝐎 𝐀𝐁𝐈𝐉𝐄𝐓 𝐉𝐇𝐀𝐓𝐔 𝐑𝐀𝐍𝐃𝐈 𝐊𝐄 `,
+            `𝐀𝐆𝐑 𝐀𝐕 𝐒𝐄 𝐁𝐎𝐓 𝐁𝐎𝐋𝐀 𝐓𝐎 𝐓𝐀𝐑𝐈 𝐌𝐀𝐀 𝐊𝐈 𝐂𝐇𝐔𝐓 𝐌𝐄 𝐌𝐀𝐆𝐈 𝐁𝐀𝐍𝐀 𝐃𝐔𝐆𝐀 ✊`,
             `🤡𝐀𝐁 𝐓𝐔 𝐏𝐈𝐑 𝐁𝐎𝐋𝐄𝐆𝐀 𝐁𝐎𝐓 𝐌𝐄 𝐂𝐇𝐎𝐃𝐔𝐆𝐀 𝐓𝐇𝐔𝐉𝐇𝐀 𝐒𝐀𝐋𝐎 𝐒𝐇𝐎𝐓`,
-            `✊𝐄𝐃𝐇𝐀𝐑 𝐆𝐀𝐋𝐈 𝐄𝐃𝐇𝐀𝐑 𝐆𝐀𝐋𝐈 𝐁𝐇𝐈𝐂𝐇 𝐌𝐄 𝐏𝐀𝐃𝐀 𝐎𝐓 𝐓𝐀𝐑𝐈 𝐌𝐀𝐀 𝐂𝐇𝐎𝐃𝐍𝐀 𝐁𝐀𝐋𝐀 𝐇𝐔 𝐌𝐄 𝐁𝐎𝐓😎`,
-            `🙂𝐃𝐎𝐒𝐓 𝐀𝐏𝐊𝐈 𝐌𝐀𝐀 𝐊𝐈 𝐂𝐇𝐔𝐓 𝐅𝐀𝐓 𝐆𝐀𝐈 🥺`,
-            `💗𝐌𝐀𝐑𝐀 𝐍𝐀𝐌𝐄 𝐁𝐎𝐓 𝐓𝐎 𝐁𝐀𝐒 𝐒𝐇𝐎𝐊 𝐌𝐄 𝐑𝐇𝐊𝐇𝐀 𝐇𝐀 𝐏𝐀𝐑 𝐓𝐀𝐑𝐈 𝐌𝐀𝐀 𝐂𝐇𝐎𝐃 𝐃𝐔𝐆𝐀 𝐀𝐁 𝐁𝐎𝐓 𝐁𝐎𝐓 𝐁𝐀𝐋𝐀 𝐓𝐎`,
-            `💔𝐀𝐉𝐈𝐈 𝐁𝐎𝐓 𝐁𝐎𝐋 𝐑𝐇𝐀 𝐇𝐀𝐈 𝐑𝐀𝐍𝐃𝐈𝐈 𝐊𝐀🦇`,
-            `💩𝐓𝐀𝐑𝐈 𝐌𝐀𝐀 𝐂𝐇𝐔𝐃 𝐁𝐀 𝐃𝐔𝐆𝐀 𝟗𝐌𝐀𝐍 𝐘𝐀𝐌𝐃𝐇𝐔𝐃 𝐏𝐀𝐏𝐀 𝐒𝐄 𝐀𝐆𝐑 𝐀𝐁 𝐁𝐎𝐓 𝐁𝐎𝐋𝐀👹`
+            `✊𝐄𝐃𝐇𝐀𝐑 𝐆𝐀𝐋𝐈 𝐄𝐃𝐇𝐀𝐑 𝐆𝐀𝐋𝐈 𝐁𝐇𝐈𝐂𝐇 𝐌𝐄 𝐏𝐀𝐃𝐀 𝐎𝐓 𝐓𝐀𝐑𝐈 𝐌𝐀𝐀 𝐂𝐇𝐎𝐃𝐍𝐀 𝐁𝐀𝐋𝐀 𝐇𝐔 𝐌𝐄 𝐁𝐎𝐓😎`
         ];
         replyMessage = botResponses[Math.floor(Math.random() * botResponses.length)];
         isReply = true;
@@ -407,6 +403,7 @@ async function handleMessage(api, event) {
       }
     }
 
+    // Command handling
     if (!body || !body.startsWith(prefix)) return;
     const args = body.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
@@ -433,79 +430,35 @@ async function handleMessage(api, event) {
           try {
             const userInfo = await api.getUserInfo(mentionedID);
             const user = userInfo[mentionedID];
-            
-            let details = `👤 USER DETAILS\n\n`;
-            details += `📛 Name: ${user.name || 'N/A'}\n`;
-            details += `🔤 First Name: ${user.firstName || 'N/A'}\n`;
-            details += `🔠 Last Name: ${user.lastName || 'N/A'}\n`;
-            details += `🆔 User ID: ${mentionedID}\n`;
-            details += `🔗 Profile: https://facebook.com/${mentionedID}\n`;
-            details += `🏠 Hometown: ${user.hometown || 'N/A'}\n`;
-            details += `📍 Location: ${user.location || 'N/A'}\n`;
-            details += `❤️ Relationship: ${user.relationship || 'N/A'}\n`;
-            details += `📅 Birthday: ${user.birthday || 'N/A'}\n`;
-            details += `📱 Gender: ${user.gender || 'N/A'}\n`;
-            
-            commandReply = details;
+            commandReply = `👤 Name: ${user.name}\n🆔 ID: ${mentionedID}\n🔗 fb.com/${mentionedID}`;
           } catch(e) {
             commandReply = `❌ Error: ${e.message}`;
           }
         } else {
-          commandReply = `👤 Your Facebook ID: ${senderID}`;
+          commandReply = `👤 Your ID: ${senderID}`;
         }
         break;
       
-      case 'details':
-      case 'info':
-        if (Object.keys(mentions || {}).length > 0) {
-          const mentionedID = Object.keys(mentions)[0];
-          try {
-            const userInfo = await api.getUserInfo(mentionedID);
-            const u = userInfo[mentionedID];
-            
-            let msg = `╔══════════════════╗\n`;
-            msg += `    📸 USER PROFILE\n`;
-            msg += `╚══════════════════╝\n\n`;
-            msg += `✨ Full Name: ${u.name || 'N/A'}\n`;
-            msg += `📝 First Name: ${u.firstName || 'N/A'}\n`;
-            msg += `📌 Last Name: ${u.lastName || 'N/A'}\n`;
-            msg += `🆔 User ID: ${mentionedID}\n`;
-            msg += `🔗 Profile: fb.com/${mentionedID}\n`;
-            msg += `🎂 Birthday: ${u.birthday || 'Private'}\n`;
-            msg += `🚻 Gender: ${u.gender || 'Private'}\n`;
-            msg += `💑 Relationship: ${u.relationship || 'Private'}\n`;
-            msg += `🏙️ Hometown: ${u.hometown || 'Private'}\n`;
-            msg += `📍 Location: ${u.location || 'Private'}\n`;
-            
-            commandReply = msg;
-          } catch(e) {
-            commandReply = `❌ Error: ${e.message}`;
-          }
-        } else {
-          commandReply = `❌ Please mention a user: ${prefix}details @user`;
-        }
-        break;
-      
-      // --- FIX 4: Fixed fight command ---
+      // FIGHT COMMAND - WORKING
       case 'fyt':
       case 'fiyt':
       case 'fight':
         if (!isAdmin) {
-          commandReply = "Permission denied, you are not the admin.";
+          commandReply = "❌ Sirf admin fight mode use kar sakta hai!";
           break;
         }
         const fightArg = args.shift();
         if (fightArg === 'on') {
           fightSessions[threadID] = { waitingForName: true };
-          commandReply = "🔥 FIGHT MODE ACTIVATED! 🔥\nEnter the target name:";
+          commandReply = "🔥 FIGHT MODE ON! 🔥\nAb target ka naam likho:";
         } else if (fightArg === 'off') {
           if (fightSessions[threadID] && fightSessions[threadID].interval) {
             clearInterval(fightSessions[threadID].interval);
           }
           delete fightSessions[threadID];
-          commandReply = "🛑 FIGHT MODE DEACTIVATED! 🛑";
+          commandReply = "🛑 FIGHT MODE OFF! 🛑";
         } else {
-          commandReply = `Sahi format use karo: ${prefix}fyt on ya ${prefix}fyt off`;
+          commandReply = `✅ Usage: ${prefix}fyt on | ${prefix}fyt off`;
         }
         break;
         
@@ -513,13 +466,13 @@ async function handleMessage(api, event) {
         if (fightSessions[threadID] && fightSessions[threadID].interval) {
           clearInterval(fightSessions[threadID].interval);
           delete fightSessions[threadID];
-          commandReply = "Fight mode stopped.";
+          commandReply = "🛑 Fight mode stopped!";
         } else if (targetSessions[threadID] && targetSessions[threadID].interval) {
           clearInterval(targetSessions[threadID].interval);
           delete targetSessions[threadID];
-          commandReply = "Target off ho gaya.";
+          commandReply = "🛑 Target mode stopped!";
         } else {
-          commandReply = "Koi fight ya target mode on nahi hai.";
+          commandReply = "❌ Koi fight/target mode active nahi hai!";
         }
         break;
         
@@ -530,21 +483,15 @@ async function handleMessage(api, event) {
       case 'help':
         await handleHelpCommand(api, event);
         return;
-        
+      
+      // ========== PHOTO LOCK - FIXED ==========
       case 'photolock':
         await handlePhotoLockCommand(api, event, args, isAdmin);
         return;
-        
-      case 'gclock':
-        await handleGCLock(api, event, args, isAdmin);
-        return;
-        
-      case 'gcremove':
-        await handleGCRemove(api, event, isAdmin);
-        return;
-        
+      
+      // ========== NICKNAME LOCK - FIXED ==========
       case 'nicklock':
-        await handleNickLock(api, event, args, isAdmin);
+        await handleNickLockCommand(api, event, args, isAdmin);
         return;
         
       case 'nickremoveall':
@@ -555,6 +502,14 @@ async function handleMessage(api, event) {
         await handleNickRemoveOff(api, event, isAdmin);
         return;
         
+      case 'gclock':
+        await handleGCLock(api, event, args, isAdmin);
+        return;
+        
+      case 'gcremove':
+        await handleGCRemove(api, event, isAdmin);
+        return;
+        
       case 'status':
         await handleStatusCommand(api, event, isAdmin);
         return;
@@ -563,7 +518,7 @@ async function handleMessage(api, event) {
         if (!isAdmin) {
           commandReply = `Teri ma ki ch.. tere baap ka nokar nahi hu randi ke!`;
         } else {
-          commandReply = `Ye h mera prefix ${prefix} ko prefix ho use lgake bole ye h mera prefix or YAMDHUD MARE PAPA HAI BATA AB TARI MAA KO CHODU KYA KAAM H THUJHA`;
+          commandReply = `✅ Prefix: ${prefix}\nCommands: ${prefix}help for list`;
         }
     }
     
@@ -577,98 +532,283 @@ async function handleMessage(api, event) {
   }
 }
 
+// ==================== GROUP NAME HANDLER ====================
 async function handleGroupCommand(api, event, args, isAdmin) {
   try {
-    const { threadID, senderID } = event;
+    const { threadID } = event;
     if (!isAdmin) {
-      const reply = await formatMessage(api, event, "Permission denied, you are not the admin.");
+      const reply = await formatMessage(api, event, "❌ Sirf admin group lock kar sakta hai!");
       return await api.sendMessage(reply, threadID);
     }
     const subCommand = args.shift();
     if (subCommand === 'on') {
       const groupName = args.join(' ');
       if (!groupName) {
-        const reply = await formatMessage(api, event, "Sahi format use karo: /group on <group_name>");
+        const reply = await formatMessage(api, event, `✅ Usage: ${prefix}group on <name>`);
         return await api.sendMessage(reply, threadID);
       }
       lockedGroups[threadID] = groupName;
       await api.setTitle(groupName, threadID);
-      const reply = await formatMessage(api, event, `😈𝐆𝐑𝐎𝐔𝐏 𝐍𝐀𝐌𝐄 𝐋𝐎𝐂𝐊 𝐇𝐎 𝐆𝐀𝐘𝐀 𝐇𝐀𝐈 𝐀𝐁 𝐂𝐇𝐀𝐍𝐆𝐄 𝐊𝐀𝐑 𝐊𝐄 𝐃𝐈𝐊𝐇𝐀 𝐓𝐄𝐑𝐈 𝐆𝐀𝐀𝐍𝐃 𝐌𝐀𝐀𝐑 𝐋𝐔𝐆𝐀😈`);
+      const reply = await formatMessage(api, event, `🔒 Group name locked: "${groupName}"`);
       await api.sendMessage(reply, threadID);
     } else if (subCommand === 'off') {
         delete lockedGroups[threadID];
-        const reply = await formatMessage(api, event, "Group name unlock ho gaya hai.");
+        const reply = await formatMessage(api, event, "🔓 Group name unlocked!");
+        await api.sendMessage(reply, threadID);
+    } else {
+        const reply = await formatMessage(api, event, `Usage: ${prefix}group on <name> | ${prefix}group off`);
         await api.sendMessage(reply, threadID);
     }
   } catch (error) {
     emitLog('❌ Error in handleGroupCommand: ' + error.message, true);
-    await api.sendMessage("Group name lock karne mein error aa gaya.", threadID);
   }
 }
 
+// ==================== NICKNAME CHANGE EVENT - FIXED ====================
+async function handleNicknameChange(api, event) {
+  try {
+    const { threadID, authorID, participantID, newNickname } = event;
+    const botID = api.getCurrentUserID();
+
+    // Bot ka nickname protect karo
+    if (participantID === botID && authorID !== adminID) {
+      if (newNickname !== botNickname) {
+        await api.changeNickname(botNickname, threadID, botID);
+        await api.sendMessage(`😈 MERA NICKNAME "${botNickname}" WAPAS KAR DIYA! 😈`, threadID);
+        emitLog(`Bot nickname restored in ${threadID}`);
+      }
+    }
+    
+    // Group nickname lock - AUTO RESTORE
+    if (lockedNicknames[threadID] && authorID !== adminID) {
+      const lockedNick = lockedNicknames[threadID];
+      
+      if (newNickname !== lockedNick) {
+        await api.changeNickname(lockedNick, threadID, participantID);
+        
+        const userInfo = await api.getUserInfo(authorID);
+        const authorName = userInfo[authorID]?.name || "Kisi ne";
+        
+        await api.sendMessage({
+          body: `🔒 @${authorName} NICKNAME LOCKED HAI! Wapas "${lockedNick}" kar diya.`,
+          mentions: [{ tag: authorName, id: authorID, fromIndex: 2 }]
+        }, threadID);
+        
+        emitLog(`Nickname restored for user ${participantID} in ${threadID}`);
+      }
+    }
+    
+    // Nick remove all mode
+    if (nickRemoveEnabled && authorID !== adminID && participantID !== botID) {
+      await api.changeNickname("", threadID, participantID);
+    }
+    
+  } catch (error) {
+    emitLog('❌ Error in handleNicknameChange: ' + error.message, true);
+  }
+}
+
+// ==================== NICKNAME LOCK COMMAND - FIXED ====================
+async function handleNickLockCommand(api, event, args, isAdmin) {
+  const { threadID } = event;
+  
+  if (!isAdmin) {
+    const reply = await formatMessage(api, event, "❌ Sirf admin nickname lock kar sakta hai!");
+    return api.sendMessage(reply, threadID);
+  }
+
+  const subCommand = args.shift()?.toLowerCase();
+  
+  if (subCommand === 'on') {
+    const newNick = args.join(' ').trim();
+    
+    if (!newNick) {
+      const reply = await formatMessage(api, event, `✅ Usage: ${prefix}nicklock on <nickname>`);
+      return api.sendMessage(reply, threadID);
+    }
+    
+    // Sab members ka nickname change karo
+    const threadInfo = await api.getThreadInfo(threadID);
+    let changedCount = 0;
+    
+    for (const user of threadInfo.participantIDs) {
+      if (user !== adminID && user !== api.getCurrentUserID()) {
+        try {
+          await api.changeNickname(newNick, threadID, user);
+          changedCount++;
+          await new Promise(resolve => setTimeout(resolve, 300));
+        } catch(e) {
+          emitLog(`Failed to change nickname for ${user}: ${e.message}`, true);
+        }
+      }
+    }
+    
+    // Store lock info
+    lockedNicknames[threadID] = newNick;
+    nickRemoveEnabled = false;
+    
+    const reply = await formatMessage(api, event, `✅ NICKNAME LOCK ON!\nSabka nickname "${newNick}" kar diya.\n${changedCount} members affected.`);
+    await api.sendMessage(reply, threadID);
+    
+  } else if (subCommand === 'off') {
+    delete lockedNicknames[threadID];
+    const reply = await formatMessage(api, event, `🔓 NICKNAME LOCK OFF! Ab koi bhi nickname change kar sakta hai.`);
+    await api.sendMessage(reply, threadID);
+    
+  } else {
+    const reply = await formatMessage(api, event, `Usage: ${prefix}nicklock on <nickname> | ${prefix}nicklock off`);
+    await api.sendMessage(reply, threadID);
+  }
+}
+
+// ==================== PHOTO LOCK - FIXED ====================
+async function handlePhotoLockCommand(api, event, args, isAdmin) {
+  try {
+    const { threadID } = event;
+    
+    if (!isAdmin) {
+      const reply = await formatMessage(api, event, "❌ Sirf admin photo lock kar sakta hai!");
+      return await api.sendMessage(reply, threadID);
+    }
+    
+    const subCommand = args.shift();
+    
+    if (subCommand === 'on') {
+      const threadInfo = await api.getThreadInfo(threadID);
+      
+      if (threadInfo.imageSrc) {
+        lockedGroupPhoto[threadID] = {
+          imageSrc: threadInfo.imageSrc,
+          lockedBy: adminID,
+          timestamp: Date.now()
+        };
+        const reply = await formatMessage(api, event, "📸 GROUP PHOTO LOCKED! Ab koi change nahi kar sakta.");
+        await api.sendMessage(reply, threadID);
+      } else {
+        const reply = await formatMessage(api, event, "❌ Pehle group mein photo set karo, phir /photolock on karo.");
+        await api.sendMessage(reply, threadID);
+      }
+      
+    } else if (subCommand === 'off') {
+      delete lockedGroupPhoto[threadID];
+      const reply = await formatMessage(api, event, "📸 GROUP PHOTO UNLOCKED! Ab koi bhi change kar sakta hai.");
+      await api.sendMessage(reply, threadID);
+      
+    } else {
+      const reply = await formatMessage(api, event, `Usage: ${prefix}photolock on | ${prefix}photolock off`);
+      await api.sendMessage(reply, threadID);
+    }
+    
+  } catch (error) {
+    emitLog('❌ Error in handlePhotoLockCommand: ' + error.message, true);
+  }
+}
+
+// ==================== GROUP IMAGE CHANGE EVENT - FIXED ====================
+async function handleGroupImageChange(api, event) {
+  try {
+    const { threadID, authorID } = event;
+    
+    // Agar photo lock on hai aur admin ne change nahi kiya to RESTORE
+    if (lockedGroupPhoto[threadID] && authorID !== adminID) {
+      const lockedPhoto = lockedGroupPhoto[threadID];
+      
+      if (lockedPhoto.imageSrc) {
+        // Wapas purani photo set karo
+        await api.changeGroupImage(lockedPhoto.imageSrc, threadID);
+        
+        const userInfo = await api.getUserInfo(authorID);
+        const authorName = userInfo[authorID]?.name || "Kisi ne";
+        
+        await api.sendMessage({
+          body: `🔒 @${authorName} GROUP PHOTO LOCKED HAI! Wapas purani photo kar di.`,
+          mentions: [{ tag: authorName, id: authorID, fromIndex: 2 }]
+        }, threadID);
+        
+        emitLog(`Group photo restored in ${threadID} - changed by ${authorID}`);
+      }
+    }
+    
+  } catch (error) {
+    emitLog('❌ Error in handleGroupImageChange: ' + error.message, true);
+  }
+}
+
+// ==================== THREAD NAME CHANGE ====================
+async function handleThreadNameChange(api, event) {
+  try {
+    const { threadID, authorID } = event;
+    const newTitle = event.logMessageData?.name;
+    
+    if (lockedGroups[threadID] && authorID !== adminID) {
+      if (newTitle !== lockedGroups[threadID]) {
+        await api.setTitle(lockedGroups[threadID], threadID);
+        await api.sendMessage(`🔒 Group name locked! Wapas "${lockedGroups[threadID]}" kar diya.`, threadID);
+        emitLog(`Group name restored in ${threadID}`);
+      }
+    }
+  } catch (error) {
+    emitLog('❌ Error in handleThreadNameChange: ' + error.message, true);
+  }
+}
+
+// ==================== OTHER COMMANDS ====================
 async function handleNicknameCommand(api, event, args, isAdmin) {
   try {
-    const { threadID, senderID } = event;
+    const { threadID } = event;
     if (!isAdmin) {
-      const reply = await formatMessage(api, event, "Permission denied, you are not the admin.");
+      const reply = await formatMessage(api, event, "❌ Sirf admin kar sakta hai!");
       return await api.sendMessage(reply, threadID);
     }
     const subCommand = args.shift();
     if (subCommand === 'on') {
       const nickname = args.join(' ');
       if (!nickname) {
-        const reply = await formatMessage(api, event, "Sahi format use karo: /nickname on <nickname>");
+        const reply = await formatMessage(api, event, `Usage: ${prefix}nickname on <nickname>`);
         return await api.sendMessage(reply, threadID);
       }
-      lockedNicknames[threadID] = nickname;
       const threadInfo = await api.getThreadInfo(threadID);
       for (const pid of threadInfo.participantIDs) {
-        if (pid !== adminID) {
+        if (pid !== adminID && pid !== api.getCurrentUserID()) {
           await api.changeNickname(nickname, threadID, pid);
+          await new Promise(resolve => setTimeout(resolve, 300));
         }
       }
-      const reply = await formatMessage(api, event, `😈𝐆𝐑𝐎𝐔𝐏 𝐊𝐀 𝐍𝐈𝐂𝐊 𝐍𝐀𝐌𝐄 𝐋𝐎𝐂𝐊 𝐇𝐎 𝐆𝐀𝐘𝐀 𝐇𝐀𝐈 𝐀𝐁 𝐀𝐁 𝐓𝐀𝐑𝐈 𝐌𝐀𝐀 𝐂𝐇𝐔𝐃𝐍𝐈 𝐏𝐀𝐊𝐈 𝐇𝐀𝐈 𝐌𝐀𝐃𝐀𝐑𝐉𝐀𝐀𝐓`);
+      const reply = await formatMessage(api, event, `✅ Sabka nickname "${nickname}" kar diya!`);
       await api.sendMessage(reply, threadID);
-    } else if (subCommand === 'off') {
-        delete lockedNicknames[threadID];
-        const reply = await formatMessage(api, event, "Group ke sabhi nicknames unlock ho gaye hain.");
-        await api.sendMessage(reply, threadID);
     }
   } catch (error) {
     emitLog('❌ Error in handleNicknameCommand: ' + error.message, true);
-    await api.sendMessage("Nickname lock karne mein error aa gaya.", threadID);
   }
 }
 
 async function handleBotNickCommand(api, event, args, isAdmin) {
-  const { threadID, senderID } = event;
+  const { threadID } = event;
   if (!isAdmin) {
-    const reply = await formatMessage(api, event, "Permission denied, you are not the admin.");
+    const reply = await formatMessage(api, event, "❌ Sirf admin bot nickname change kar sakta hai!");
     return api.sendMessage(reply, threadID);
   }
   const newNickname = args.join(' ');
   if (!newNickname) {
-    const reply = await formatMessage(api, event, "Sahi format use karo: /botnick <nickname>");
+    const reply = await formatMessage(api, event, `Usage: ${prefix}botnick <nickname>`);
     return api.sendMessage(reply, threadID);
   }
   botNickname = newNickname;
   const botID = api.getCurrentUserID();
   try {
-    fs.writeFileSync('config.json', JSON.stringify({ botNickname: newNickname }, null, 2));
+    fs.writeFileSync('config.json', JSON.stringify({ botNickname: newNickname, cookies: currentCookies }, null, 2));
     await api.changeNickname(newNickname, threadID, botID);
-    const reply = await formatMessage(api, event, `😈MERA NICKNAME AB ${newNickname} HO GAYA HAI BOSSS.😈`);
+    const reply = await formatMessage(api, event, `✅ Bot nickname changed to: ${newNickname}`);
     await api.sendMessage(reply, threadID);
   } catch (e) {
     emitLog('❌ Error setting bot nickname: ' + e.message, true);
-    const reply = await formatMessage(api, event, '❌ Error: Bot ka nickname nahi badal paya.');
-    await api.sendMessage(reply, threadID);
   }
 }
 
 async function handleTargetCommand(api, event, args, isAdmin) {
-  const { threadID, senderID } = event;
+  const { threadID } = event;
   if (!isAdmin) {
-    const reply = await formatMessage(api, event, "Permission denied, you are not the admin.");
+    const reply = await formatMessage(api, event, "❌ Sirf admin target mode use kar sakta hai!");
     return await api.sendMessage(reply, threadID);
   }
 
@@ -679,13 +819,13 @@ async function handleTargetCommand(api, event, args, isAdmin) {
     const targetName = args.join(' ');
 
     if (!fileNumber || !targetName) {
-      const reply = await formatMessage(api, event, `Sahi format use karo: ${prefix}target on <file_number> <name>`);
+      const reply = await formatMessage(api, event, `Usage: ${prefix}target on <file_number> <name>`);
       return await api.sendMessage(reply, threadID);
     }
 
     const filePath = path.join(__dirname, `np${fileNumber}.txt`);
     if (!fs.existsSync(filePath)) {
-      const reply = await formatMessage(api, event, `❌ **Error!** File "np${fileNumber}.txt" nahi mila.`);
+      const reply = await formatMessage(api, event, `❌ File "np${fileNumber}.txt" nahi mila.`);
       return await api.sendMessage(reply, threadID);
     }
 
@@ -694,17 +834,12 @@ async function handleTargetCommand(api, event, args, isAdmin) {
       .filter(line => line.trim() !== '');
 
     if (targetMessages.length === 0) {
-      const reply = await formatMessage(api, event, `❌ **Error!** File "np${fileNumber}.txt" khali hai.`);
+      const reply = await formatMessage(api, event, `❌ File "np${fileNumber}.txt" khali hai.`);
       return await api.sendMessage(reply, threadID);
     }
-    
-    await api.sendMessage(`😈[ 𝗠𝗘𝗡𝗘 𝗧𝗔𝗥𝗚𝗘𝗧 𝗞𝗢 𝗟𝗢𝗖𝗞 𝗞𝗔𝗥 𝗗𝗜𝗬𝗔 𝗛𝗔𝗜 𝗕𝗢𝗦𝗦 𝗜𝗦𝗞𝗜........ 𝗕𝗘𝗛𝗔𝗡 𝗞𝗢 𝗟𝗨𝗡𝗗 𝗣𝗘 𝗚𝗨𝗡𝗚𝗥𝗨 𝗕𝗔𝗡𝗗 𝗞𝗘 𝗘𝗦𝗘 𝗖𝗛𝗢𝗗𝗨𝗚𝗔 𝗞𝗘 𝗠𝗢𝗛𝗟𝗟𝗘 𝗩𝗔𝗟𝗘 𝗕𝗛𝗜 𝗖𝗢𝗡𝗙𝗨𝗦𝗘 𝗛𝗢 𝗝𝗔𝗬𝗘𝗚𝗘 𝗞𝗘 𝗞𝗜𝗥𝗧𝗔𝗡 𝗛𝗢 𝗥𝗔 𝗛𝗔𝗜 𝗬𝗔 𝗖𝗛𝗨𝗗𝗔𝗜😈]`, threadID);
 
     if (targetSessions[threadID] && targetSessions[threadID].interval) {
       clearInterval(targetSessions[threadID].interval);
-      delete targetSessions[threadID];
-      const reply = await formatMessage(api, event, "Purana target band karke naya shuru kar raha hu.");
-      await api.sendMessage(reply, threadID);
     }
 
     let currentIndex = 0;
@@ -725,259 +860,109 @@ async function handleTargetCommand(api, event, args, isAdmin) {
       targetName,
       interval
     };
-    const reply = await formatMessage(api, event, `💣 **Target lock!** ${targetName} pe 10 second ke delay se messages start ho gaye.`);
+    
+    const reply = await formatMessage(api, event, `🎯 TARGET LOCKED! ${targetName} pe 10 sec mein attack start.`);
     await api.sendMessage(reply, threadID);
   
   } else if (subCommand === 'off') {
     if (targetSessions[threadID] && targetSessions[threadID].interval) {
       clearInterval(targetSessions[threadID].interval);
       delete targetSessions[threadID];
-      const reply = await formatMessage(api, event, "🛑 **Target Off!** Attack band ho gaya hai.");
+      const reply = await formatMessage(api, event, "🛑 Target mode off!");
       await api.sendMessage(reply, threadID);
     } else {
-      const reply = await formatMessage(api, event, "❌ Koi bhi target mode on nahi hai.");
+      const reply = await formatMessage(api, event, "❌ Target mode active nahi hai!");
       await api.sendMessage(reply, threadID);
     }
-  } else {
-    const reply = await formatMessage(api, event, `Sahi format use karo: ${prefix}target on <file_number> <name> ya ${prefix}target off`);
-    await api.sendMessage(reply, threadID);
   }
-}
-
-async function handleThreadNameChange(api, event) {
-  try {
-    const { threadID, authorID } = event;
-    const newTitle = event.logMessageData?.name;
-    if (lockedGroups[threadID] && authorID !== adminID) {
-      if (newTitle !== lockedGroups[threadID]) {
-        await api.setTitle(lockedGroups[threadID], threadID);
-        const userInfo = await api.getUserInfo(authorID);
-        const authorName = userInfo[authorID]?.name || "User";
-        
-        await api.sendMessage({
-          body: `😂𝐆𝐎𝐑𝐔𝐏 𝐊𝐀 𝐍𝐀𝐌𝐄 𝐂𝐇𝐀𝐍𝐆𝐄 𝐊𝐀𝐑𝐄𝐆𝐀 𝐓𝐌𝐊𝐂 𝐃𝐎𝐒𝐓 𝐀𝐁 𝐀𝐏𝐊𝐈 𝐁𝐇𝐄𝐀𝐍 𝐂𝐇𝐔𝐃 𝐆𝐀𝐈 😂😂`,
-          mentions: [{ tag: authorName, id: authorID, fromIndex: 0 }]
-        }, threadID);
-      }
-    }
-  } catch (error) {
-    emitLog('❌ Error in handleThreadNameChange: ' + error.message, true);
-  }
-}
-
-async function handleNicknameChange(api, event) {
-  try {
-    const { threadID, authorID, participantID, newNickname } = event;
-    const botID = api.getCurrentUserID();
-
-    if (participantID === botID && authorID !== adminID) {
-      if (newNickname !== botNickname) {
-        await api.changeNickname(botNickname, threadID, botID);
-        await api.sendMessage(`😈MERA NICKNAME KIO BADLA BSDK, MAINE APNA NAAM WAPAS ${botNickname} RAKH LIYA HAI😈`, threadID);
-      }
-    }
-    
-    if (lockedNicknames[threadID] && authorID !== adminID) {
-      if (newNickname !== lockedNicknames[threadID]) {
-        await api.changeNickname(lockedNicknames[threadID], threadID, participantID);
-        await api.sendMessage(`😈GROUP KA NICK NAME CHANGE HO RE HAI AGAR KOI BADLEGA TO USKI PERSONAL ARMY BANUNGA😈`, threadID);
-      }
-    }
-  } catch (error) {
-    emitLog('❌ Error in handleNicknameChange: ' + error.message, true);
-  }
-}
-
-async function handleGroupImageChange(api, event) {
-  try {
-    const { threadID, authorID } = event;
-    if (lockedGroupPhoto[threadID] && authorID !== adminID) {
-      const threadInfo = await api.getThreadInfo(threadID);
-      if (threadInfo.imageSrc) {
-        lockedGroupPhoto[threadID] = threadInfo.imageSrc;
-        await api.sendMessage(`Group photo kyu change kiya? Teri ma chod dunga.`, threadID);
-      }
-    }
-  } catch (error) {
-    emitLog('❌ Error in handleGroupImageChange: ' + error.message, true);
-  }
-}
-
-async function handlePhotoLockCommand(api, event, args, isAdmin) {
-  try {
-    const { threadID, senderID } = event;
-    if (!isAdmin) {
-      const reply = await formatMessage(api, event, "Permission denied, you are not the admin.");
-      return await api.sendMessage(reply, threadID);
-    }
-    const subCommand = args.shift();
-    if (subCommand === 'on') {
-      const threadInfo = await api.getThreadInfo(threadID);
-      if (threadInfo.imageSrc) {
-        lockedGroupPhoto[threadID] = threadInfo.imageSrc;
-        const reply = await formatMessage(api, event, "📸 Group photo lock ho gaya hai.");
-        await api.sendMessage(reply, threadID);
-      } else {
-        const reply = await formatMessage(api, event, "❌ Group photo lock karne ke liye pehle ek photo set karo.");
-        await api.sendMessage(reply, threadID);
-      }
-    } else if (subCommand === 'off') {
-        delete lockedGroupPhoto[threadID];
-        const reply = await formatMessage(api, event, "📸 Group photo unlock ho gaya hai.");
-        await api.sendMessage(reply, threadID);
-    } else {
-        const reply = await formatMessage(api, event, "Sahi format use karo: /photolock on ya /photolock off");
-        await api.sendMessage(reply, threadID);
-    }
-  } catch (error) {
-    emitLog('❌ Error in handlePhotoLockCommand: ' + error.message, true);
-    await api.sendMessage("Photo lock karne mein error aa gaya.", threadID);
-  }
-}
-
-async function handleHelpCommand(api, event) {
-  const { threadID, senderID } = event;
-  const helpMessage = `
-⚜️ 𝐁𝐎𝐓 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 (𝟗𝐌𝐀𝐍-𝐗-𝐘𝐀𝐌𝐃𝐇𝐔𝐃) ⚜️
----
-📚 **𝐌𝐀𝐃𝐀𝐃**:
-  ${prefix}help ➡️ 𝐒𝐀𝐀𝐑𝐄 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 𝐊𝐈 𝐋𝐈𝐒𝐓 𝐃𝐄𝐊𝐇𝐄𝐈𝐍.
-
-🔐 𝐆𝐑𝐎𝐔𝐏 𝐒𝐄𝐂𝐔𝐑𝐈𝐓𝐘:
-  ${prefix}group on <name> ➡️ 𝐆𝐑𝐎𝐔𝐏 𝐊𝐀 𝐍𝐀𝐀𝐌 𝐋𝐎𝐂𝐊 𝐊𝐀𝐑𝐄𝐈𝐍.
-  ${prefix}group off ➡️ 𝐆𝐑𝐎𝐔𝐏 𝐍𝐀𝐌𝐄 𝐔𝐍𝐋𝐎𝐂𝐊.
-  ${prefix}nickname on <name> ➡️ 𝐒𝐀𝐁𝐇𝐈 𝐍𝐈𝐂𝐊𝐍𝐀𝐌𝐄𝐒 𝐋𝐎𝐂𝐊.
-  ${prefix}nickname off ➡️ 𝐒𝐀𝐁𝐇𝐈 𝐍𝐈𝐂𝐊𝐍𝐀𝐌𝐄𝐒 𝐔𝐍𝐋𝐎𝐂𝐊.
-  ${prefix}photolock on ➡️ 𝐆𝐑𝐎𝐔𝐏 𝐏𝐇𝐎𝐓𝐎 𝐋𝐎𝐂𝐊.
-  ${prefix}photolock off ➡️ 𝐆𝐑𝐎𝐔𝐏 𝐏𝐇𝐎𝐓𝐎 𝐔𝐍𝐋𝐎𝐂𝐊.
-  ${prefix}botnick <name> ➡️ 𝐁𝐎𝐓 𝐊𝐀 𝐍𝐈𝐂𝐊𝐍𝐀𝐌𝐄 𝐒𝐄𝐓.
-
-💥 𝐓𝐀𝐑𝐆𝐄𝐓 𝐒𝐘𝐒𝐓𝐄𝐌:
-  ${prefix}target on <file_number> <name> ➡️ 𝐀𝐔𝐓𝐎-𝐀𝐓𝐓𝐀𝐂𝐊 𝐒𝐇𝐔𝐑𝐔.
-  ${prefix}target off ➡️ 𝐀𝐓𝐓𝐀𝐂𝐊 𝐁𝐀𝐍𝐃.
-
-⚔️ **𝐅𝐈𝐆𝐇𝐓 𝐌𝐎𝐃𝐄**:
-  ${prefix}fyt on ➡️ 𝐅𝐈𝐆𝐇𝐓 𝐌𝐎𝐃𝐄 𝐒𝐇𝐔𝐑𝐔.
-  ${prefix}fyt off ➡️ 𝐅𝐈𝐆𝐇𝐓 𝐌𝐎𝐃𝐄 𝐁𝐀𝐍𝐃.
-  ${prefix}stop ➡️ 𝐅𝐈𝐆𝐇𝐓/𝐓𝐀𝐑𝐆𝐄𝐓 𝐁𝐀𝐍𝐃.
-
-🆔 **𝐈𝐃 𝐃𝐄𝐓𝐀𝐈𝐋𝐒**:
-  ${prefix}tid ➡️ 𝐆𝐑𝐎𝐔𝐏 𝐈𝐃.
-  ${prefix}uid ➡️ 𝐀𝐏𝐍𝐈 𝐈𝐃.
-  ${prefix}uid @user ➡️ 𝐔𝐒𝐄𝐑 𝐊𝐈 𝐈𝐃.
-  ${prefix}details @user ➡️ 𝐔𝐒𝐄𝐑 𝐊𝐈 𝐅𝐔𝐋𝐋 𝐃𝐄𝐓𝐀𝐈𝐋𝐒.
-`;
-  const formattedHelp = await formatMessage(api, event, helpMessage.trim());
-  await api.sendMessage(formattedHelp, threadID);
 }
 
 async function handleGCLock(api, event, args, isAdmin) {
-  const { threadID, senderID } = event;
-  if (!isAdmin) {
-    const reply = await formatMessage(api, event, "Permission denied, you are not the admin.");
-    return api.sendMessage(reply, threadID);
-  }
-
+  const { threadID } = event;
+  if (!isAdmin) return;
   const newName = args.join(' ').trim();
-  if (!newName) {
-    const reply = await formatMessage(api, event, "❌ Please provide a group name");
-    return api.sendMessage(reply, threadID);
-  }
-
+  if (!newName) return;
   lockedGroups[threadID] = newName;
-  gcAutoRemoveEnabled = false;
-
   await api.setTitle(newName, threadID);
-  const reply = await formatMessage(api, event, `🔒 Group name locked: "${newName}"`);
-  api.sendMessage(reply, threadID);
+  await api.sendMessage(`🔒 Group name locked: "${newName}"`, threadID);
 }
 
 async function handleGCRemove(api, event, isAdmin) {
-  const { threadID, senderID } = event;
-  if (!isAdmin) {
-    const reply = await formatMessage(api, event, "Permission denied, you are not the admin.");
-    return api.sendMessage(reply, threadID);
-  }
-
+  const { threadID } = event;
+  if (!isAdmin) return;
   delete lockedGroups[threadID];
-  gcAutoRemoveEnabled = true;
-  const reply = await formatMessage(api, event, "🧹 Auto-remove ON ✅");
-  api.sendMessage(reply, threadID);
-}
-
-async function handleNickLock(api, event, args, isAdmin) {
-  const { threadID, senderID } = event;
-  if (!isAdmin) {
-    const reply = await formatMessage(api, event, "Permission denied, you are not the admin.");
-    return api.sendMessage(reply, threadID);
-  }
-
-  const newNick = args.join(' ').trim();
-  if (!newNick) {
-    const reply = await formatMessage(api, event, "❌ Please provide a nickname");
-    return api.sendMessage(reply, threadID);
-  }
-
-  nickLockEnabled = true;
-  lockedNicknames[threadID] = newNick;
-
-  const threadInfo = await api.getThreadInfo(threadID);
-  for (const user of threadInfo.userInfo) {
-    if (String(user.id) !== adminID) {
-      await api.changeNickname(newNick, threadID, String(user.id));
-    }
-  }
-  const reply = await formatMessage(api, event, `🔐 Nickname locked: "${newNick}"`);
-  api.sendMessage(reply, threadID);
+  await api.sendMessage(`🔓 Group name unlocked`, threadID);
 }
 
 async function handleNickRemoveAll(api, event, isAdmin) {
-  const { threadID, senderID } = event;
-  if (!isAdmin) {
-    const reply = await formatMessage(api, event, "Permission denied, you are not the admin.");
-    return api.sendMessage(reply, threadID);
-  }
-
+  const { threadID } = event;
+  if (!isAdmin) return;
   nickRemoveEnabled = true;
   delete lockedNicknames[threadID];
-
   const threadInfo = await api.getThreadInfo(threadID);
   for (const user of threadInfo.userInfo) {
     if (String(user.id) !== adminID && String(user.id) !== api.getCurrentUserID()) {
       await api.changeNickname("", threadID, String(user.id));
+      await new Promise(resolve => setTimeout(resolve, 300));
     }
   }
-  const reply = await formatMessage(api, event, "💥 Nicknames cleared. Auto-remove ON");
-  api.sendMessage(reply, threadID);
+  await api.sendMessage(`💥 All nicknames cleared! Auto-remove ON`, threadID);
 }
 
 async function handleNickRemoveOff(api, event, isAdmin) {
-  const { threadID, senderID } = event;
-  if (!isAdmin) {
-    const reply = await formatMessage(api, event, "Permission denied, you are not the admin.");
-    return api.sendMessage(reply, threadID);
-  }
-
+  const { threadID } = event;
+  if (!isAdmin) return;
   nickRemoveEnabled = false;
-  const reply = await formatMessage(api, event, "🛑 Nick auto-remove OFF");
-  api.sendMessage(reply, threadID);
+  await api.sendMessage(`🛑 Nick auto-remove OFF`, threadID);
 }
 
 async function handleStatusCommand(api, event, isAdmin) {
-  const { threadID, senderID } = event;
-  if (!isAdmin) {
-    const reply = await formatMessage(api, event, "Permission denied, you are not the admin.");
-    return api.sendMessage(reply, threadID);
-  }
-
+  const { threadID } = event;
+  if (!isAdmin) return;
+  
   const msg = `
 📊 BOT STATUS:
-• GC Lock: ${lockedGroups[threadID] ? "ON ✅" : "OFF ❌"}
+• Group Lock: ${lockedGroups[threadID] ? "ON ✅" : "OFF ❌"}
 • Nick Lock: ${lockedNicknames[threadID] ? `ON ✅ (${lockedNicknames[threadID]})` : "OFF ❌"}
 • Photo Lock: ${lockedGroupPhoto[threadID] ? "ON ✅" : "OFF ❌"}
 • Fight Mode: ${fightSessions[threadID]?.active ? "ON ✅" : "OFF ❌"}
 • Target Mode: ${targetSessions[threadID]?.active ? "ON ✅" : "OFF ❌"}
+• Nick Auto-Remove: ${nickRemoveEnabled ? "ON ✅" : "OFF ❌"}
 `;
-  const reply = await formatMessage(api, event, msg.trim());
-  api.sendMessage(reply, threadID);
+  await api.sendMessage(msg, threadID);
+}
+
+async function handleHelpCommand(api, event) {
+  const helpMessage = `
+⚜️ 𝐘𝐀𝐌𝐃𝐇𝐔𝐃 𝐁𝐎𝐓 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 ⚜️
+---
+🔐 GROUP COMMANDS:
+  ${prefix}group on <name> - Lock group name
+  ${prefix}group off - Unlock group name
+  ${prefix}photolock on - Lock group photo
+  ${prefix}photolock off - Unlock group photo
+
+👤 NICKNAME COMMANDS:
+  ${prefix}nicklock on <nick> - Lock all nicknames
+  ${prefix}nicklock off - Unlock nicknames
+  ${prefix}nickremoveall - Clear all nicknames
+  ${prefix}nickremoveoff - Stop auto-remove
+  ${prefix}botnick <name> - Change bot nickname
+
+⚔️ FIGHT/TARGET:
+  ${prefix}fyt on - Start fight mode
+  ${prefix}fyt off - Stop fight mode
+  ${prefix}target on <file> <name> - Start target attack
+  ${prefix}target off - Stop target attack
+  ${prefix}stop - Stop all active modes
+
+🆔 INFO:
+  ${prefix}tid - Get group ID
+  ${prefix}uid - Get your ID
+  ${prefix}uid @user - Get user ID
+  ${prefix}status - Check all locks
+  ${prefix}help - Show this menu
+`;
+  const formattedHelp = await formatMessage(api, event, helpMessage);
+  await api.sendMessage(formattedHelp, event.threadID);
 }
