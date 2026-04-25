@@ -13,7 +13,7 @@ const io = new Server(server);
 let botAPI = null;
 let adminID = null;
 let prefix = '/';
-let botNickname = 'BOT TAKLA';
+let botNickname = 'YAMDHUD BOT PAPA';
 
 let lockedGroups = {};
 let lockedNicknames = {};
@@ -26,8 +26,8 @@ let nickRemoveEnabled = false;
 let gcAutoRemoveEnabled = false;
 let currentCookies = null;
 let reconnectAttempt = 0;
-const signature = `\n                      ♦♦♦♦♦\n            ༄༒M̷R̷✞…༒PRINCE✞✓™༄`;
-const separator = `\n---😈---😈---😈---😈---😈---😈---`;
+const signature = `\n                ⚜️⚜️\n           𝟗𝐌𝐀𝐍-𝐗-𝐘𝐀𝐌𝐃𝐇𝐔𝐃`;
+const separator = `\n⚜️___⚜️𝟗𝐌𝐀𝐌-𝐗-𝐘𝐀𝐌𝐃𝐇𝐔𝐃___⚜️____⚜️`;
 
 // --- UTILITY FUNCTIONS ---
 function emitLog(message, isError = false) {
