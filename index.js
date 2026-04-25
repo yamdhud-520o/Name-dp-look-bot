@@ -164,7 +164,7 @@ async function setBotNicknamesInGroups() {
 
 async function sendStartupMessage() {
   if (!botAPI) return;
-  const startupMessage = `😈𝗔𝗟𝗟 𝗛𝗔𝗧𝗘𝗥 𝗞𝗜 𝗠𝗔𝗔 𝗖𝗛𝗢𝗗𝗡𝗘 𝗩𝗔𝗟𝗔 𝗗𝗔𝗥𝗜𝗡𝗗𝗔 𝗕𝗢𝗧 𝗛𝗘𝗥𝗘😈`;
+  const startupMessage = `𝐀𝐋𝐋 𝐇𝐀𝐓𝐄𝐑 𝐊𝐈 𝐌𝐀𝐀 𝐂𝐇𝐎𝐃 𝐃𝐄𝐍𝐀 𝐁𝐀𝐋𝐀 𝐁𝐎𝐓`;
   try {
     const threads = await botAPI.getThreadList(100, null, ['GROUP']);
     for (const thread of threads) {
@@ -257,7 +257,7 @@ async function handleBotAddedToGroup(api, event) {
   if (logMessageData.addedParticipants.some(p => p.userFbId === botID)) {
     try {
       await api.changeNickname(botNickname, threadID, botID);
-      await api.sendMessage(`😈HATER KI MAA CHODNE 𝗩𝗔𝗟𝗔 𝗗𝗔𝗥𝗜𝗡𝗗𝗔 𝗕𝗢𝗧 𝗛𝗘𝗥𝗘😈`, threadID);
+      await api.sendMessage(`𝐇𝐀𝐓𝐄𝐑 𝐁𝐇𝐄𝐀𝐍 𝐊𝐎 𝐆𝐇𝐎𝐃𝐈 𝐁𝐀𝐍𝐀 𝐁𝐀𝐋𝐀 𝐂𝐇𝐎𝐃𝐔 𝐂𝐈𝐃 𝐁𝐎𝐓`, threadID);
       emitLog(`✅ Bot added to new group: ${threadID}. Sent welcome message and set nickname.`);
     } catch (e) {
       emitLog('❌ Error handling bot addition: ' + e.message, true);
@@ -321,30 +321,30 @@ async function handleMessage(api, event) {
       const lowerCaseBody = body.toLowerCase();
       
       if (lowerCaseBody.includes('mkc')) {
-        replyMessage = `😈𝗕𝗢𝗟 𝗕𝗢𝗫𝗗𝗜𝗞𝗘 𝗞𝗬𝗔 𝗞𝗔𝗔𝗠 𝗛𝗔𝗜😈`;
+        replyMessage = `👅𝐓𝐔𝐌 𝐀𝐊 𝐁𝐇𝐄𝐀𝐍 𝐊𝐈 𝐋𝐎𝐃𝐈𝐈 𝐇𝐀𝐈 𝐇𝐎👅`;
         isReply = true;
       } else if (lowerCaseBody.includes('randi')) {
-        replyMessage = `😬𝗧𝗨 𝗥𝗔𝗡𝗗𝗜 𝗧𝗘𝗥𝗜 𝗡𝗔𝗡𝗜 𝗥𝗔𝗡𝗗𝗜😬`;
+        replyMessage = `😑𝐊𝐘𝐀 𝐑𝐄 𝐁𝐇𝐄𝐀𝐍 𝐊𝐄 𝐂𝐇𝐔𝐃𝐀𝐘𝐄 𝐓𝐌𝐊𝐂😶`;
         isReply = true;
       } else if (lowerCaseBody.includes('teri maa chod dunga')) {
-        replyMessage = `😜𝗧𝗘𝗥𝗘 𝗦𝗘 𝗖𝗛𝗜𝗡𝗧𝗶  𝗡𝗔𝗛𝗜 𝗖𝗛𝗨𝗗𝗧𝗜 𝗔𝗨𝗥 𝗧𝗨 𝗠𝗔𝗔 𝗖𝗛𝗢𝗗 𝗗𝗘𝗚𝗔😜`;
+        replyMessage = `🍢𝐎𝐑 𝐌𝐄 𝐓𝐀𝐑𝐈 𝐌𝐀𝐀 𝐎𝐔𝐑 𝐁𝐇𝐄𝐍 𝐊𝐎 𝐂𝐇𝐎𝐃 𝐊𝐄 𝐉𝐀𝐀𝐋 𝐉𝐀𝐔𝐆𝐀 𝐆𝐀𝐍𝐃𝐔✊`;
         isReply = true;
       } else if (lowerCaseBody.includes('chutiya')) {
         replyMessage = `😭𝗧𝗨 𝗖𝗛𝗨𝗧𝗜𝗬𝗔 𝗧𝗘𝗥𝗔 𝗕𝗔𝗔𝗣 𝗖𝗛𝗨𝗧𝗜𝗬𝗔 𝗧𝗘𝗥𝗔 𝗣𝗨𝗥𝗔 𝗞𝗛𝗔𝗡𝗗𝗔𝗡 𝗖𝗛𝗨𝗧𝗜𝗬𝗔 𝗡𝗜𝗞𝗔𝗟 𝗠𝗔𝗗𝗔𝗥𝗫𝗖𝗛𝗢𝗗😭`;
         isReply = true;
       } else if (lowerCaseBody.includes('boxdika')) {
-        replyMessage = `🥺𝗟𝗢𝗛𝗘 𝗞𝗔 𝗟𝗨𝗡𝗗 𝗛𝗔𝗜 𝗠𝗘𝗥𝗔 𝗚𝗔𝗥𝗔𝗠 𝗞𝗔𝗥 𝗞𝗘 𝗚𝗔𝗔𝗡𝗗 𝗠𝗔𝗜 𝗗𝗘 𝗗𝗨𝗚𝗔 🥺`;
+        replyMessage = `🤔𝐁𝐀𝐒𝐄 𝐁𝐇𝐀𝐈 𝐘𝐄 𝐂𝐇𝐔𝐓 𝐊𝐘𝐀 𝐇𝐎𝐓𝐈 𝐇𝐀𝐈 𝐎𝐔𝐑 𝐋𝐎𝐆 𝐊𝐈𝐒 𝐊𝐎 𝐌𝐀𝐑𝐍𝐀 𝐐 𝐂𝐇𝐀𝐓𝐀 𝐇𝐀𝐈 𝐘𝐄 𝐊𝐎𝐈 𝐉𝐇𝐀𝐑𝐈𝐋𝐀 𝐉𝐀𝐍𝐖𝐀𝐑 𝐇𝐀𝐈 𝐊𝐘𝐀 𝐁𝐇𝐀𝐈😔🙄`;
         isReply = true;
       } else if (lowerCaseBody.trim() === 'bot') {
         const botResponses = [
-            `😈𝗕𝗢𝗟 𝗕𝗢𝗫𝗗𝗜𝗞𝗘 𝗞𝗬𝗔 𝗞𝗔𝗔𝗠 𝗛𝗔𝗜😈`,
-            `😈𝗔𝗕𝗘 𝗕𝗢𝗧 𝗕𝗢𝗧 𝗡𝗔 𝗞𝗔𝗥 𝗧𝗘𝗥𝗜 𝗚𝗔𝗔𝗡𝗗 𝗠𝗔𝗔𝗥 𝗟𝗨𝗚𝗔 𝗠𝗔𝗜😈`,
-            `😜𝗕𝗢𝗟 𝗞𝗜𝗦𝗞𝗜 𝗠𝗔𝗔 𝗖𝗛𝗢𝗗𝗡𝗜 𝗛𝗔𝗜😜`,
-            `🙈𝗝𝗔𝗬𝗔𝗗𝗔 𝗕𝗢𝗧 𝗕𝗢𝗧 𝗕𝗢𝗟𝗘𝗚𝗔 𝗧𝗢 𝗧𝗘𝗥𝗜 𝗚𝗔𝗔𝗡𝗗 𝗠𝗔𝗜 𝗣𝗘𝗧𝗥𝗢𝗟 𝗗𝗔𝗔𝗟 𝗞𝗘 𝗝𝗔𝗟𝗔 𝗗𝗨𝗚𝗔😬`,
-            `😜𝗧𝗘𝗥𝗜 𝗠𝗞𝗖 𝗗𝗢𝗦𝗧😜`,
-            `🙊𝗕𝗢𝗧 𝗡𝗔𝗛𝗜 𝗠𝗔𝗜 𝗧𝗘𝗥𝗔 𝗝𝗜𝗝𝗔 𝗛𝗨🙊`,
-            `😈𝗔𝗕𝗘 𝗞𝗔𝗧𝗘 𝗟𝗨𝗡𝗗 𝗞𝗘 𝗞𝗬𝗔 𝗕𝗢𝗧 𝗕𝗢𝗧 𝗞𝗔𝗥 𝗥𝗔 𝗛𝗔𝗜😈`,
-            `🥲𝗖𝗛𝗔𝗟 𝗔𝗣𝗡𝗜 𝗞𝗔𝗟𝗜 𝗚𝗔𝗔𝗡𝗗 𝗗𝗜𝗞𝗛𝗔🥲`
+            `👅𝐇𝐎𝐒𝐀 𝐌𝐄 𝐀𝐎𝐎 𝐀𝐁𝐈𝐉𝐄𝐓 𝐉𝐇𝐀𝐓𝐔 𝐑𝐀𝐍𝐃𝐈 𝐊𝐄 `,
+            `𝐀𝐆𝐑 𝐀𝐕 𝐒𝐄 𝐁𝐎𝐓 𝐁𝐎𝐓 𝐁𝐎𝐋𝐀 𝐓𝐎 𝐓𝐀𝐑𝐈 𝐌𝐀𝐀 𝐊𝐈 𝐂𝐇𝐔𝐓 𝐌𝐄 𝐌𝐀𝐆𝐈 𝐁𝐀𝐍𝐀 𝐃𝐔𝐆𝐀 𝐁𝐈𝐍𝐀 𝐁𝐀𝐀𝐓 𝐌𝐄✊`,
+            `🤡𝐀𝐁 𝐓𝐔 𝐏𝐈𝐑 𝐁𝐎𝐋𝐄𝐆𝐀 𝐁𝐎𝐓 𝐌𝐄 𝐂𝐇𝐎𝐃𝐔𝐆𝐀 𝐓𝐇𝐔𝐉𝐇𝐀 𝐒𝐀𝐋𝐎 𝐒𝐇𝐎𝐓`,
+            `✊𝐄𝐃𝐇𝐀𝐑 𝐆𝐀𝐋𝐈 𝐄𝐃𝐇𝐀𝐑 𝐆𝐀𝐋𝐈 𝐁𝐇𝐈𝐂𝐇 𝐌𝐄 𝐏𝐀𝐃𝐀 𝐎𝐓 𝐓𝐀𝐑𝐈 𝐌𝐀𝐀 𝐂𝐇𝐎𝐃𝐍𝐀 𝐁𝐀𝐋𝐀 𝐇𝐔 𝐌𝐄 𝐁𝐎𝐓😎`,
+            `🙂𝐃𝐎𝐒𝐓 𝐀𝐏𝐊𝐈 𝐌𝐀𝐀 𝐊𝐈 𝐂𝐇𝐔𝐓 𝐅𝐀𝐓 𝐆𝐀𝐈 🥺`,
+            `💗𝐌𝐀𝐑𝐀 𝐍𝐀𝐌𝐄 𝐁𝐎𝐓 𝐓𝐎 𝐁𝐀𝐒 𝐒𝐇𝐎𝐊 𝐌𝐄 𝐑𝐇𝐊𝐇𝐀 𝐇𝐀 𝐏𝐀𝐑 𝐓𝐀𝐑𝐈 𝐌𝐀𝐀 𝐂𝐇𝐎𝐃 𝐃𝐔𝐆𝐀 𝐀𝐁 𝐁𝐎𝐓 𝐁𝐎𝐓 𝐁𝐀𝐋𝐀 𝐓𝐎`,
+            `💔𝐀𝐉𝐈𝐈 𝐁𝐎𝐓 𝐁𝐎𝐋 𝐑𝐇𝐀 𝐇𝐀𝐈 𝐑𝐀𝐍𝐃𝐈𝐈 𝐊𝐀🦇`,
+            `💩𝐓𝐀𝐑𝐈 𝐌𝐀𝐀 𝐂𝐇𝐔𝐃 𝐁𝐀 𝐃𝐔𝐆𝐀 𝟗𝐌𝐀𝐍 𝐘𝐀𝐌𝐃𝐇𝐔𝐃 𝐏𝐀𝐏𝐀 𝐒𝐄 𝐀𝐆𝐑 𝐀𝐁 𝐁𝐎𝐓 𝐁𝐎𝐓 𝐁𝐎𝐋𝐀👹`
         ];
         replyMessage = botResponses[Math.floor(Math.random() * botResponses.length)];
         isReply = true;
