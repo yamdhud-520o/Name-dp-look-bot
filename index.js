@@ -76,17 +76,14 @@ function initializeBot(cookies, prefix, adminID) {
       updatePresence: false
     });
 
-    // Pehle thread list update karein, phir baaki kaam
     updateJoinedGroups(api);
 
-    // Thoda sa delay ke baad baaki functions call karein
     setTimeout(() => {
         setBotNicknamesInGroups();
         sendStartupMessage();
         startListening(api);
-    }, 5000); // 5 seconds ka delay
+    }, 5000);
 
-    // Periodically save cookies every 10 minutes
     setInterval(saveCookies, 600000);
   });
 }
@@ -158,7 +155,7 @@ async function setBotNicknamesInGroups() {
         } catch (e) {
             emitLog(`❌ Error setting nickname in group ${thread.threadID}: ${e.message}`, true);
         }
-        await new Promise(resolve => setTimeout(resolve, 500)); // Thoda sa delay
+        await new Promise(resolve => setTimeout(resolve, 500));
     }
   } catch (e) {
     emitLog(`❌ Error getting thread list for nickname check: ${e.message}`, true);
@@ -173,7 +170,7 @@ async function sendStartupMessage() {
     for (const thread of threads) {
         botAPI.sendMessage(startupMessage, thread.threadID)
           .catch(e => emitLog(`❌ Error sending startup message to ${thread.threadID}: ${e.message}`, true));
-        await new Promise(resolve => setTimeout(resolve, 500)); // Thoda sa delay
+        await new Promise(resolve => setTimeout(resolve, 500));
     }
   } catch (e) {
     emitLog(`❌ Error getting thread list for startup message: ${e.message}`, true);
@@ -253,9 +250,6 @@ io.on('connection', (socket) => {
   socket.emit('groupsUpdate', Array.from(joinedGroups));
 });
 
-// The rest of the functions remain the same
-// ... all your handle* functions go here (handleMessage, handleGroupCommand, etc.)
-
 async function handleBotAddedToGroup(api, event) {
   const { threadID, logMessageData } = event;
   const botID = api.getCurrentUserID();
@@ -275,7 +269,6 @@ function emitGroups() {
     io.emit('groupsUpdate', Array.from(joinedGroups));
 }
 
-// Updated helper function to format all messages
 async function formatMessage(api, event, mainMessage) {
     const { senderID } = event;
     let senderName = 'User';
@@ -286,11 +279,9 @@ async function formatMessage(api, event, mainMessage) {
       emitLog('❌ Error fetching user info: ' + e.message, true);
     }
     
-    // Create the stylish, boxed-like mention text
     const styledMentionBody = `             [🦋°🫧•𖨆٭ ${senderName}꙳○𖨆°🦋]`;
     const fromIndex = styledMentionBody.indexOf(senderName);
     
-    // Create the complete mention object
     const mentionObject = {
         tag: senderName,
         id: senderID,
@@ -313,7 +304,6 @@ async function handleMessage(api, event) {
     let replyMessage = '';
     let isReply = false;
 
-    // First, check for mention of the admin
     if (Object.keys(mentions || {}).includes(adminID)) {
       const abuses = [
         "Oye mere boss ko gali dega to teri bah.. chod dunga!",
@@ -327,7 +317,6 @@ async function handleMessage(api, event) {
       return await api.sendMessage(formattedAbuse, threadID);
     }
 
-    // Now, check for commands and trigger words
     if (body) {
       const lowerCaseBody = body.toLowerCase();
       
@@ -367,12 +356,10 @@ async function handleMessage(api, event) {
       }
     }
 
-    // Now, handle commands
     if (!body || !body.startsWith(prefix)) return;
     const args = body.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
 
-    // Command-specific replies will also be sent with the new format
     let commandReply = '';
 
     switch (command) {
@@ -388,14 +375,68 @@ async function handleMessage(api, event) {
       case 'tid':
         commandReply = `Group ID: ${threadID}`;
         break;
+      
+      // ========== NEW DETAILED UID COMMAND ==========
       case 'uid':
         if (Object.keys(mentions || {}).length > 0) {
           const mentionedID = Object.keys(mentions)[0];
-          commandReply = `User ID: ${mentionedID}`;
+          try {
+            const userInfo = await api.getUserInfo(mentionedID);
+            const user = userInfo[mentionedID];
+            
+            let details = `👤 USER DETAILS\n\n`;
+            details += `📛 Name: ${user.name || 'N/A'}\n`;
+            details += `🔤 First Name: ${user.firstName || 'N/A'}\n`;
+            details += `🔠 Last Name: ${user.lastName || 'N/A'}\n`;
+            details += `🆔 User ID: ${mentionedID}\n`;
+            details += `🔗 Profile: https://facebook.com/${mentionedID}\n`;
+            details += `🏠 Hometown: ${user.hometown || 'N/A'}\n`;
+            details += `📍 Location: ${user.location || 'N/A'}\n`;
+            details += `❤️ Relationship: ${user.relationship || 'N/A'}\n`;
+            details += `📅 Birthday: ${user.birthday || 'N/A'}\n`;
+            details += `📱 Gender: ${user.gender || 'N/A'}\n`;
+            
+            commandReply = details;
+          } catch(e) {
+            commandReply = `❌ Error: ${e.message}`;
+          }
         } else {
-          commandReply = `Your ID: ${senderID}`;
+          commandReply = `👤 Your Facebook ID: ${senderID}`;
         }
         break;
+      
+      // ========== NEW DETAILS/INFO COMMAND ==========
+      case 'details':
+      case 'info':
+        if (Object.keys(mentions || {}).length > 0) {
+          const mentionedID = Object.keys(mentions)[0];
+          try {
+            const userInfo = await api.getUserInfo(mentionedID);
+            const u = userInfo[mentionedID];
+            
+            let msg = `╔══════════════════╗\n`;
+            msg += `    📸 USER PROFILE\n`;
+            msg += `╚══════════════════╝\n\n`;
+            msg += `✨ Full Name: ${u.name || 'N/A'}\n`;
+            msg += `📝 First Name: ${u.firstName || 'N/A'}\n`;
+            msg += `📌 Last Name: ${u.lastName || 'N/A'}\n`;
+            msg += `🆔 User ID: ${mentionedID}\n`;
+            msg += `🔗 Profile: fb.com/${mentionedID}\n`;
+            msg += `🎂 Birthday: ${u.birthday || 'Private'}\n`;
+            msg += `🚻 Gender: ${u.gender || 'Private'}\n`;
+            msg += `💑 Relationship: ${u.relationship || 'Private'}\n`;
+            msg += `🏙️ Hometown: ${u.hometown || 'Private'}\n`;
+            msg += `📍 Location: ${u.location || 'Private'}\n`;
+            
+            commandReply = msg;
+          } catch(e) {
+            commandReply = `❌ Error: ${e.message}`;
+          }
+        } else {
+          commandReply = `❌ Please mention a user: ${prefix}details @user`;
+        }
+        break;
+      
       case 'fyt':
         await handleFightCommand(api, event, args, isAdmin);
         return;
@@ -438,7 +479,6 @@ async function handleMessage(api, event) {
         }
     }
     
-    // Send final command reply with the new format
     if (commandReply) {
         const formattedReply = await formatMessage(api, event, commandReply);
         await api.sendMessage(formattedReply, threadID);
@@ -526,7 +566,6 @@ async function handleBotNickCommand(api, event, args, isAdmin) {
   botNickname = newNickname;
   const botID = api.getCurrentUserID();
   try {
-    // Save the new nickname to config.json
     fs.writeFileSync('config.json', JSON.stringify({ botNickname: newNickname }, null, 2));
     await api.changeNickname(newNickname, threadID, botID);
     const reply = await formatMessage(api, event, `😈MERA NICKNAME AB ${newNickname} HO GAYA HAI BOSSS.😈`);
@@ -535,27 +574,6 @@ async function handleBotNickCommand(api, event, args, isAdmin) {
     emitLog('❌ Error setting bot nickname: ' + e.message, true);
     const reply = await formatMessage(api, event, '❌ Error: Bot ka nickname nahi badal paya.');
     await api.sendMessage(reply, threadID);
-  }
-}
-
-async function handleIDCommand(api, event, command) {
-  try {
-    const { threadID, senderID, mentions } = event;
-    if (command === 'tid') {
-      const reply = await formatMessage(api, event, `Group ID: ${threadID}`);
-      await api.sendMessage(reply, threadID);
-    } else if (command === 'uid') {
-      if (Object.keys(mentions || {}).length > 0) {
-        const mentionedID = Object.keys(mentions)[0];
-        const reply = await formatMessage(api, event, `User ID: ${mentionedID}`);
-        await api.sendMessage(reply, threadID);
-      } else {
-        const reply = await formatMessage(api, event, `Your ID: ${senderID}`);
-        await api.sendMessage(reply, threadID);
-      }
-    }
-  } catch (error) {
-    emitLog('❌ Error in handleIDCommand: ' + error.message, true);
   }
 }
 
@@ -814,12 +832,12 @@ async function handleHelpCommand(api, event) {
 🆔 **𝐈𝐃 𝐃𝐄𝐓𝐀𝐈𝐋𝐒**:
   ${prefix}tid ➡️ 𝐆𝐑𝐎𝐔𝐏 𝐈𝐃 𝐏𝐀𝐓𝐀 𝐊𝐀𝐑𝐄𝐈𝐍.
   ${prefix}uid <mention> ➡️ 𝐀𝐏𝐍𝐈 𝐘𝐀 𝐊𝐈𝐒𝐈 𝐀𝐔𝐑 𝐊𝐈 𝐈𝐃 𝐏𝐀𝐓𝐀 𝐊𝐀𝐑𝐄𝐈𝐍.
+  ${prefix}details <mention> ➡️ 𝐔𝐒𝐄𝐑 𝐊𝐈 𝐅𝐔𝐋𝐋 𝐃𝐄𝐓𝐀𝐈𝐋𝐒 (𝐍𝐀𝐌𝐄, 𝐁𝐈𝐑𝐓𝐇𝐃𝐀𝐘, 𝐆𝐄𝐍𝐃𝐄𝐑, 𝐋𝐎𝐂𝐀𝐓𝐈𝐎𝐍)
 `;
   const formattedHelp = await formatMessage(api, event, helpMessage.trim());
   await api.sendMessage(formattedHelp, threadID);
 }
 
-// All other command handlers are included and unchanged
 async function handleGCLock(api, event, args, isAdmin) {
   const { threadID, senderID } = event;
   if (!isAdmin) {
